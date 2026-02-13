@@ -152,51 +152,758 @@ pub unsafe trait ISOSMethodEnum: ISOSEnum {
     ) -> HRESULT;
 }
 
-// Forward declarations for DAC structures (opaque pointers)
-// These would need full definitions if you want to use them
-pub type DacpThreadStoreData = std::ffi::c_void;
-pub type DacpAppDomainStoreData = std::ffi::c_void;
-pub type DacpAppDomainData = std::ffi::c_void;
-pub type DacpAssemblyData = std::ffi::c_void;
-pub type DacpModuleData = std::ffi::c_void;
-pub type DacpThreadData = std::ffi::c_void;
-pub type DacpMethodDescData = std::ffi::c_void;
-pub type DacpReJitData = std::ffi::c_void;
-pub type DacpCodeHeaderData = std::ffi::c_void;
-pub type DacpJitManagerInfo = std::ffi::c_void;
-pub type DacpThreadpoolData = std::ffi::c_void;
-pub type DacpWorkRequestData = std::ffi::c_void;
-pub type DacpHillClimbingLogEntry = std::ffi::c_void;
-pub type DacpObjectData = std::ffi::c_void;
-pub type DacpMethodTableData = std::ffi::c_void;
-pub type DacpMethodTableFieldData = std::ffi::c_void;
-pub type DacpMethodTableTransparencyData = std::ffi::c_void;
-pub type DacpFieldDescData = std::ffi::c_void;
-pub type DacpGcHeapData = std::ffi::c_void;
-pub type DacpGcHeapDetails = std::ffi::c_void;
-pub type DacpHeapSegmentData = std::ffi::c_void;
-pub type DacpOomData = std::ffi::c_void;
-pub type DacpGcHeapAnalyzeData = std::ffi::c_void;
-pub type DacpDomainLocalModuleData = std::ffi::c_void;
-pub type DacpThreadLocalModuleData = std::ffi::c_void;
-pub type DacpSyncBlockData = std::ffi::c_void;
-pub type DacpSyncBlockCleanupData = std::ffi::c_void;
-pub type DacpRCWData = std::ffi::c_void;
-pub type DacpCCWData = std::ffi::c_void;
-pub type DacpCOMInterfacePointerData = std::ffi::c_void;
-pub type DacpUsefulGlobalsData = std::ffi::c_void;
-pub type DacpAllocData = std::ffi::c_void;
-pub type DacpGenerationAllocData = std::ffi::c_void;
-pub type DacpJitCodeHeapInfo = std::ffi::c_void;
-pub type DacpMethodDescTransparencyData = std::ffi::c_void;
-pub type DacpExceptionObjectData = std::ffi::c_void;
-pub type DacpGCInterestingInfoData = std::ffi::c_void;
-pub type DacpTieredVersionData = std::ffi::c_void;
-pub type DacpMethodTableCollectibleData = std::ffi::c_void;
-pub type DacpReJitData2 = std::ffi::c_void;
-pub type DacpProfilerILData = std::ffi::c_void;
-pub type DacpGenerationData = std::ffi::c_void;
-pub type DACEHInfo = std::ffi::c_void;
+// ============================================================================
+// DAC Data Structures
+// These structures are used by the SOS debugging interfaces to return data
+// from the CLR runtime. They have fixed layouts for backwards compatibility.
+// ============================================================================
+
+/// Number of GC generations (0, 1, 2, LOH)
+pub const DAC_NUMBERGENERATIONS: usize = 4;
+
+/// Thread store data - information about all managed threads.
+/// Size: 0x38 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpThreadStoreData {
+    pub threadCount: i32,
+    pub unstartedThreadCount: i32,
+    pub backgroundThreadCount: i32,
+    pub pendingThreadCount: i32,
+    pub deadThreadCount: i32,
+    pub firstThread: CLRDATA_ADDRESS,
+    pub finalizerThread: CLRDATA_ADDRESS,
+    pub gcThread: CLRDATA_ADDRESS,
+    pub fHostConfig: u32,
+}
+
+/// AppDomain store data - information about all AppDomains.
+/// Size: 0x18 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpAppDomainStoreData {
+    pub sharedDomain: CLRDATA_ADDRESS,
+    pub systemDomain: CLRDATA_ADDRESS,
+    pub DomainCount: i32,
+}
+
+/// AppDomain data stage enumeration.
+#[repr(i32)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum DacpAppDomainDataStage {
+    #[default]
+    STAGE_CREATING = 0,
+    STAGE_READYFORMANAGEDCODE = 1,
+    STAGE_ACTIVE = 2,
+    STAGE_OPEN = 3,
+    STAGE_UNLOAD_REQUESTED = 4,
+    STAGE_EXITING = 5,
+    STAGE_EXITED = 6,
+    STAGE_FINALIZING = 7,
+    STAGE_FINALIZED = 8,
+    STAGE_HANDLETABLE_NOACCESS = 9,
+    STAGE_CLEARED = 10,
+    STAGE_COLLECTED = 11,
+    STAGE_CLOSED = 12,
+}
+
+/// AppDomain data - information about a specific AppDomain.
+/// Size: 0x48 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpAppDomainData {
+    pub AppDomainPtr: CLRDATA_ADDRESS,
+    pub AppSecDesc: CLRDATA_ADDRESS,
+    pub pLowFrequencyHeap: CLRDATA_ADDRESS,
+    pub pHighFrequencyHeap: CLRDATA_ADDRESS,
+    pub pStubHeap: CLRDATA_ADDRESS,
+    pub DomainLocalBlock: CLRDATA_ADDRESS,
+    pub pDomainLocalModules: CLRDATA_ADDRESS,
+    pub dwId: u32,
+    pub AssemblyCount: i32,
+    pub FailedAssemblyCount: i32,
+    pub appDomainStage: DacpAppDomainDataStage,
+}
+
+/// Assembly data - information about a loaded assembly.
+/// Size: 0x40 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpAssemblyData {
+    pub AssemblyPtr: CLRDATA_ADDRESS,
+    pub ClassLoader: CLRDATA_ADDRESS,
+    pub ParentDomain: CLRDATA_ADDRESS,
+    pub DomainPtr: CLRDATA_ADDRESS,
+    pub AssemblySecDesc: CLRDATA_ADDRESS,
+    pub isDynamic: i32,
+    pub ModuleCount: u32,
+    pub LoadContext: u32,
+    pub isDomainNeutral: i32,
+    pub dwLocationFlags: u32,
+}
+
+/// Module data - information about a loaded module.
+/// Size: 0xa0 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpModuleData {
+    pub Address: CLRDATA_ADDRESS,
+    pub PEAssembly: CLRDATA_ADDRESS,
+    pub ilBase: CLRDATA_ADDRESS,
+    pub metadataStart: CLRDATA_ADDRESS,
+    pub metadataSize: u64,
+    pub Assembly: CLRDATA_ADDRESS,
+    pub bIsReflection: i32,
+    pub bIsPEFile: i32,
+    pub dwBaseClassIndex: u64,
+    pub dwModuleID: u64,
+    pub dwTransientFlags: u32,
+    pub TypeDefToMethodTableMap: CLRDATA_ADDRESS,
+    pub TypeRefToMethodTableMap: CLRDATA_ADDRESS,
+    pub MethodDefToDescMap: CLRDATA_ADDRESS,
+    pub FieldDefToDescMap: CLRDATA_ADDRESS,
+    pub MemberRefToDescMap: CLRDATA_ADDRESS,
+    pub FileReferencesMap: CLRDATA_ADDRESS,
+    pub ManifestModuleReferencesMap: CLRDATA_ADDRESS,
+    pub LoaderAllocator: CLRDATA_ADDRESS,
+    pub ThunkHeap: CLRDATA_ADDRESS,
+    pub dwModuleIndex: u64,
+}
+
+/// Thread data - information about a managed thread.
+/// Size: 0x68 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpThreadData {
+    pub corThreadId: u32,
+    pub osThreadId: u32,
+    pub state: i32,
+    pub preemptiveGCDisabled: u32,
+    pub allocContextPtr: CLRDATA_ADDRESS,
+    pub allocContextLimit: CLRDATA_ADDRESS,
+    pub context: CLRDATA_ADDRESS,
+    pub domain: CLRDATA_ADDRESS,
+    pub pFrame: CLRDATA_ADDRESS,
+    pub lockCount: u32,
+    pub firstNestedException: CLRDATA_ADDRESS,
+    pub teb: CLRDATA_ADDRESS,
+    pub fiberData: CLRDATA_ADDRESS,
+    pub lastThrownObjectHandle: CLRDATA_ADDRESS,
+    pub nextThread: CLRDATA_ADDRESS,
+}
+
+/// ReJIT data flags.
+#[repr(u32)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum DacpReJitDataFlags {
+    #[default]
+    kUnknown = 0,
+    kRequested = 1,
+    kActive = 2,
+    kReverted = 3,
+}
+
+/// ReJIT data - information about a rejitted method.
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpReJitData {
+    pub rejitID: CLRDATA_ADDRESS,
+    pub flags: DacpReJitDataFlags,
+    pub NativeCodeAddr: CLRDATA_ADDRESS,
+}
+
+/// MethodDesc data - information about a method.
+/// Size: 0x98 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpMethodDescData {
+    pub bHasNativeCode: i32,
+    pub bIsDynamic: i32,
+    pub wSlotNumber: u16,
+    pub NativeCodeAddr: CLRDATA_ADDRESS,
+    pub AddressOfNativeCodeSlot: CLRDATA_ADDRESS,
+    pub MethodDescPtr: CLRDATA_ADDRESS,
+    pub MethodTablePtr: CLRDATA_ADDRESS,
+    pub ModulePtr: CLRDATA_ADDRESS,
+    pub MDToken: u32,
+    pub GCInfo: CLRDATA_ADDRESS,
+    pub GCStressCodeCopy: CLRDATA_ADDRESS,
+    pub managedDynamicMethodObject: CLRDATA_ADDRESS,
+    pub requestedIP: CLRDATA_ADDRESS,
+    pub rejitDataCurrent: DacpReJitData,
+    pub rejitDataRequested: DacpReJitData,
+    pub cJittedRejitVersions: u32,
+}
+
+/// JIT types enumeration.
+#[repr(u32)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum JITTypes {
+    #[default]
+    TYPE_UNKNOWN = 0,
+    TYPE_JIT = 1,
+    TYPE_PJIT = 2,
+    TYPE_INTERPRETER = 3,
+}
+
+/// Code header data - information about JIT compiled code.
+/// Size: 0x38 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpCodeHeaderData {
+    pub GCInfo: CLRDATA_ADDRESS,
+    pub JITType: JITTypes,
+    pub MethodDescPtr: CLRDATA_ADDRESS,
+    pub MethodStart: CLRDATA_ADDRESS,
+    pub MethodSize: u32,
+    pub ColdRegionStart: CLRDATA_ADDRESS,
+    pub ColdRegionSize: u32,
+    pub HotRegionSize: u32,
+}
+
+/// JIT manager info.
+/// Size: 0x18 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpJitManagerInfo {
+    pub managerAddr: CLRDATA_ADDRESS,
+    pub codeType: u32,
+    pub ptrHeapList: CLRDATA_ADDRESS,
+}
+
+/// Threadpool data - information about the CLR thread pool.
+/// Size: 0x58 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpThreadpoolData {
+    pub cpuUtilization: i32,
+    pub NumIdleWorkerThreads: i32,
+    pub NumWorkingWorkerThreads: i32,
+    pub NumRetiredWorkerThreads: i32,
+    pub MinLimitTotalWorkerThreads: i32,
+    pub MaxLimitTotalWorkerThreads: i32,
+    pub FirstUnmanagedWorkRequest: CLRDATA_ADDRESS,
+    pub HillClimbingLog: CLRDATA_ADDRESS,
+    pub HillClimbingLogFirstIndex: i32,
+    pub HillClimbingLogSize: i32,
+    pub NumTimers: u32,
+    pub NumCPThreads: i32,
+    pub NumFreeCPThreads: i32,
+    pub MaxFreeCPThreads: i32,
+    pub NumRetiredCPThreads: i32,
+    pub MaxLimitTotalCPThreads: i32,
+    pub CurrentLimitTotalCPThreads: i32,
+    pub MinLimitTotalCPThreads: i32,
+    pub AsyncTimerCallbackCompletionFPtr: CLRDATA_ADDRESS,
+}
+
+/// Work request data.
+/// Size: 0x18 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpWorkRequestData {
+    pub Function: CLRDATA_ADDRESS,
+    pub Context: CLRDATA_ADDRESS,
+    pub NextWorkRequest: CLRDATA_ADDRESS,
+}
+
+/// Hill climbing log entry.
+/// Size: 0x18 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpHillClimbingLogEntry {
+    pub TickCount: u32,
+    pub Transition: i32,
+    pub NewControlSetting: i32,
+    pub LastHistoryCount: i32,
+    pub LastHistoryMean: f64,
+}
+
+/// Object type enumeration.
+#[repr(u32)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum DacpObjectType {
+    #[default]
+    OBJ_STRING = 0,
+    OBJ_FREE = 1,
+    OBJ_OBJECT = 2,
+    OBJ_ARRAY = 3,
+    OBJ_OTHER = 4,
+}
+
+/// Object data - information about a managed object.
+/// Size: 0x60 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpObjectData {
+    pub MethodTable: CLRDATA_ADDRESS,
+    pub ObjectType: DacpObjectType,
+    pub Size: u64,
+    pub ElementTypeHandle: CLRDATA_ADDRESS,
+    pub ElementType: u32,
+    pub dwRank: u32,
+    pub dwNumComponents: u64,
+    pub dwComponentSize: u64,
+    pub ArrayDataPtr: CLRDATA_ADDRESS,
+    pub ArrayBoundsPtr: CLRDATA_ADDRESS,
+    pub ArrayLowerBoundsPtr: CLRDATA_ADDRESS,
+    pub RCW: CLRDATA_ADDRESS,
+    pub CCW: CLRDATA_ADDRESS,
+}
+
+/// MethodTable data - information about a type's method table.
+/// Size: 0x48 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpMethodTableData {
+    pub bIsFree: i32,
+    pub Module: CLRDATA_ADDRESS,
+    pub Class: CLRDATA_ADDRESS,
+    pub ParentMethodTable: CLRDATA_ADDRESS,
+    pub wNumInterfaces: u16,
+    pub wNumMethods: u16,
+    pub wNumVtableSlots: u16,
+    pub wNumVirtuals: u16,
+    pub BaseSize: u32,
+    pub ComponentSize: u32,
+    pub cl: u32,
+    pub dwAttrClass: u32,
+    pub bIsShared: i32,
+    pub bIsDynamic: i32,
+    pub bContainsPointers: i32,
+}
+
+/// MethodTable field data.
+/// Size: 0x18 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpMethodTableFieldData {
+    pub wNumInstanceFields: u16,
+    pub wNumStaticFields: u16,
+    pub wNumThreadStaticFields: u16,
+    pub FirstField: CLRDATA_ADDRESS,
+    pub wContextStaticOffset: u16,
+    pub wContextStaticsSize: u16,
+}
+
+/// MethodTable transparency data.
+/// Size: 0xc bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpMethodTableTransparencyData {
+    pub bHasCriticalTransparentInfo: i32,
+    pub bIsCritical: i32,
+    pub bIsTreatAsSafe: i32,
+}
+
+/// Field descriptor data.
+/// Size: 0x40 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpFieldDescData {
+    pub Type: u32,
+    pub sigType: u32,
+    pub MTOfType: CLRDATA_ADDRESS,
+    pub ModuleOfType: CLRDATA_ADDRESS,
+    pub TokenOfType: u32,
+    pub mb: u32,
+    pub MTOfEnclosingClass: CLRDATA_ADDRESS,
+    pub dwOffset: u32,
+    pub bIsThreadLocal: i32,
+    pub bIsContextLocal: i32,
+    pub bIsStatic: i32,
+    pub NextField: CLRDATA_ADDRESS,
+}
+
+/// GC heap data - global GC information.
+/// Size: 0x10 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpGcHeapData {
+    pub bServerMode: i32,
+    pub bGcStructuresValid: i32,
+    pub HeapCount: u32,
+    pub g_max_generation: u32,
+}
+
+/// Generation data.
+/// Size: 0x20 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpGenerationData {
+    pub start_segment: CLRDATA_ADDRESS,
+    pub allocation_start: CLRDATA_ADDRESS,
+    pub allocContextPtr: CLRDATA_ADDRESS,
+    pub allocContextLimit: CLRDATA_ADDRESS,
+}
+
+/// GC heap details - detailed information about a GC heap.
+/// Size: 0x120 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpGcHeapDetails {
+    pub heapAddr: CLRDATA_ADDRESS,
+    pub alloc_allocated: CLRDATA_ADDRESS,
+    pub mark_array: CLRDATA_ADDRESS,
+    pub current_c_gc_state: CLRDATA_ADDRESS,
+    pub next_sweep_obj: CLRDATA_ADDRESS,
+    pub saved_sweep_ephemeral_seg: CLRDATA_ADDRESS,
+    pub saved_sweep_ephemeral_start: CLRDATA_ADDRESS,
+    pub background_saved_lowest_address: CLRDATA_ADDRESS,
+    pub background_saved_highest_address: CLRDATA_ADDRESS,
+    pub generation_table: [DacpGenerationData; DAC_NUMBERGENERATIONS],
+    pub ephemeral_heap_segment: CLRDATA_ADDRESS,
+    pub finalization_fill_pointers: [CLRDATA_ADDRESS; DAC_NUMBERGENERATIONS + 3],
+    pub lowest_address: CLRDATA_ADDRESS,
+    pub highest_address: CLRDATA_ADDRESS,
+    pub card_table: CLRDATA_ADDRESS,
+}
+
+/// Heap segment data.
+/// Size: 0x58 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpHeapSegmentData {
+    pub segmentAddr: CLRDATA_ADDRESS,
+    pub allocated: CLRDATA_ADDRESS,
+    pub committed: CLRDATA_ADDRESS,
+    pub reserved: CLRDATA_ADDRESS,
+    pub used: CLRDATA_ADDRESS,
+    pub mem: CLRDATA_ADDRESS,
+    pub next: CLRDATA_ADDRESS,
+    pub gc_heap: CLRDATA_ADDRESS,
+    pub highAllocMark: CLRDATA_ADDRESS,
+    pub flags: usize,
+    pub background_allocated: CLRDATA_ADDRESS,
+}
+
+/// OOM (Out of Memory) data.
+/// Size: 0x38 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpOomData {
+    pub reason: i32,
+    pub alloc_size: u64,
+    pub available_pagefile_mb: u64,
+    pub gc_index: u64,
+    pub fgm: i32,
+    pub size: u64,
+    pub loh_p: i32,
+}
+
+/// GC heap analyze data.
+/// Size: 0x20 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpGcHeapAnalyzeData {
+    pub heapAddr: CLRDATA_ADDRESS,
+    pub internal_root_array: CLRDATA_ADDRESS,
+    pub internal_root_array_index: u64,
+    pub heap_analyze_success: i32,
+}
+
+/// Domain local module data.
+/// Size: 0x30 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpDomainLocalModuleData {
+    pub appDomainAddr: CLRDATA_ADDRESS,
+    pub ModuleID: u64,
+    pub pClassData: CLRDATA_ADDRESS,
+    pub pDynamicClassTable: CLRDATA_ADDRESS,
+    pub pGCStaticDataStart: CLRDATA_ADDRESS,
+    pub pNonGCStaticDataStart: CLRDATA_ADDRESS,
+}
+
+/// Thread local module data.
+/// Size: 0x30 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpThreadLocalModuleData {
+    pub threadAddr: CLRDATA_ADDRESS,
+    pub ModuleIndex: u64,
+    pub pClassData: CLRDATA_ADDRESS,
+    pub pDynamicClassTable: CLRDATA_ADDRESS,
+    pub pGCStaticDataStart: CLRDATA_ADDRESS,
+    pub pNonGCStaticDataStart: CLRDATA_ADDRESS,
+}
+
+/// SyncBlock data.
+/// Size: 0x48 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpSyncBlockData {
+    pub Object: CLRDATA_ADDRESS,
+    pub bFree: i32,
+    pub SyncBlockPointer: CLRDATA_ADDRESS,
+    pub COMFlags: u32,
+    pub MonitorHeld: u32,
+    pub Recursion: u32,
+    pub HoldingThread: CLRDATA_ADDRESS,
+    pub AdditionalThreadCount: u32,
+    pub appDomainPtr: CLRDATA_ADDRESS,
+    pub SyncBlockCount: u32,
+}
+
+/// SyncBlock cleanup data.
+/// Size: 0x28 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpSyncBlockCleanupData {
+    pub SyncBlockPointer: CLRDATA_ADDRESS,
+    pub nextSyncBlock: CLRDATA_ADDRESS,
+    pub blockRCW: CLRDATA_ADDRESS,
+    pub blockClassFactory: CLRDATA_ADDRESS,
+    pub blockCCW: CLRDATA_ADDRESS,
+}
+
+/// RCW (Runtime Callable Wrapper) data.
+/// Size: 0x58 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpRCWData {
+    pub identityPointer: CLRDATA_ADDRESS,
+    pub unknownPointer: CLRDATA_ADDRESS,
+    pub managedObject: CLRDATA_ADDRESS,
+    pub jupiterObject: CLRDATA_ADDRESS,
+    pub vtablePtr: CLRDATA_ADDRESS,
+    pub creatorThread: CLRDATA_ADDRESS,
+    pub ctxCookie: CLRDATA_ADDRESS,
+    pub refCount: i32,
+    pub interfaceCount: i32,
+    pub isJupiterObject: i32,
+    pub supportsIInspectable: i32,
+    pub isAggregated: i32,
+    pub isContained: i32,
+    pub isFreeThreaded: i32,
+    pub isDisconnected: i32,
+}
+
+/// CCW (COM Callable Wrapper) data.
+/// Size: 0x48 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpCCWData {
+    pub outerIUnknown: CLRDATA_ADDRESS,
+    pub managedObject: CLRDATA_ADDRESS,
+    pub handle: CLRDATA_ADDRESS,
+    pub ccwAddress: CLRDATA_ADDRESS,
+    pub refCount: i32,
+    pub interfaceCount: i32,
+    pub isNeutered: i32,
+    pub jupiterRefCount: i32,
+    pub isPegged: i32,
+    pub isGlobalPegged: i32,
+    pub hasStrongRef: i32,
+    pub isExtendsCOMObject: i32,
+    pub isAggregated: i32,
+}
+
+/// COM interface pointer data.
+/// Size: 0x18 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpCOMInterfacePointerData {
+    pub methodTable: CLRDATA_ADDRESS,
+    pub interfacePtr: CLRDATA_ADDRESS,
+    pub comContext: CLRDATA_ADDRESS,
+}
+
+/// Useful globals data.
+/// Size: 0x28 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpUsefulGlobalsData {
+    pub ArrayMethodTable: CLRDATA_ADDRESS,
+    pub StringMethodTable: CLRDATA_ADDRESS,
+    pub ObjectMethodTable: CLRDATA_ADDRESS,
+    pub ExceptionMethodTable: CLRDATA_ADDRESS,
+    pub FreeMethodTable: CLRDATA_ADDRESS,
+}
+
+/// Allocation data.
+/// Size: 0x10 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpAllocData {
+    pub allocBytes: CLRDATA_ADDRESS,
+    pub allocBytesLoh: CLRDATA_ADDRESS,
+}
+
+/// Generation allocation data.
+/// Size: 0x40 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpGenerationAllocData {
+    pub allocData: [DacpAllocData; DAC_NUMBERGENERATIONS],
+}
+
+/// Code heap type enumeration.
+#[repr(u32)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum CodeHeapType {
+    #[default]
+    CODEHEAP_LOADER = 0,
+    CODEHEAP_HOST = 1,
+    CODEHEAP_UNKNOWN = 2,
+}
+
+/// JIT code heap info.
+/// Size: 0x18 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpJitCodeHeapInfo {
+    pub codeHeapType: u32,
+    pub address1: CLRDATA_ADDRESS,
+    pub address2: CLRDATA_ADDRESS,
+}
+
+/// MethodDesc transparency data.
+/// Size: 0xc bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpMethodDescTransparencyData {
+    pub bHasCriticalTransparentInfo: i32,
+    pub bIsCritical: i32,
+    pub bIsTreatAsSafe: i32,
+}
+
+/// Exception object data.
+/// Size: 0x38 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpExceptionObjectData {
+    pub Message: CLRDATA_ADDRESS,
+    pub InnerException: CLRDATA_ADDRESS,
+    pub StackTrace: CLRDATA_ADDRESS,
+    pub WatsonBuckets: CLRDATA_ADDRESS,
+    pub StackTraceString: CLRDATA_ADDRESS,
+    pub RemoteStackTraceString: CLRDATA_ADDRESS,
+    pub HResult: i32,
+    pub XCode: i32,
+}
+
+/// GC interesting info data constants.
+pub const DAC_NUM_GC_DATA_POINTS: usize = 9;
+pub const DAC_MAX_COMPACT_REASONS_COUNT: usize = 11;
+pub const DAC_MAX_EXPAND_MECHANISMS_COUNT: usize = 6;
+pub const DAC_MAX_GC_MECHANISM_BITS_COUNT: usize = 2;
+pub const DAC_MAX_GLOBAL_GC_MECHANISMS_COUNT: usize = 6;
+
+/// GC interesting info data.
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpGCInterestingInfoData {
+    pub interestingDataPoints: [usize; DAC_NUM_GC_DATA_POINTS],
+    pub compactReasons: [usize; DAC_MAX_COMPACT_REASONS_COUNT],
+    pub expandMechanisms: [usize; DAC_MAX_EXPAND_MECHANISMS_COUNT],
+    pub bitMechanisms: [usize; DAC_MAX_GC_MECHANISM_BITS_COUNT],
+    pub globalMechanisms: [usize; DAC_MAX_GLOBAL_GC_MECHANISMS_COUNT],
+}
+
+/// Optimization tier enumeration.
+#[repr(u32)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum OptimizationTier {
+    #[default]
+    OptimizationTier_Unknown = 0,
+    OptimizationTier_MinOptJitted = 1,
+    OptimizationTier_Optimized = 2,
+    OptimizationTier_QuickJitted = 3,
+    OptimizationTier_OptimizedTier1 = 4,
+    OptimizationTier_ReadyToRun = 5,
+    OptimizationTier_OptimizedTier1OSR = 6,
+    OptimizationTier_QuickJittedInstrumented = 7,
+    OptimizationTier_OptimizedTier1Instrumented = 8,
+}
+
+/// Tiered version data.
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpTieredVersionData {
+    pub NativeCodeAddr: CLRDATA_ADDRESS,
+    pub OptimizationTier: OptimizationTier,
+    pub NativeCodeVersionNodePtr: CLRDATA_ADDRESS,
+}
+
+/// MethodTable collectible data.
+/// Size: 0x10 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpMethodTableCollectibleData {
+    pub LoaderAllocatorObjectHandle: CLRDATA_ADDRESS,
+    pub bCollectible: i32,
+}
+
+/// ReJIT data 2 flags.
+#[repr(u32)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum DacpReJitData2Flags {
+    #[default]
+    kUnknown = 0,
+    kRequested = 1,
+    kActive = 2,
+    kReverted = 3,
+}
+
+/// ReJIT data 2.
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpReJitData2 {
+    pub rejitID: u32,
+    pub flags: DacpReJitData2Flags,
+    pub il: CLRDATA_ADDRESS,
+    pub ilCodeVersionNodePtr: CLRDATA_ADDRESS,
+}
+
+/// Profiler IL modification type.
+#[repr(u32)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum ProfilerILModificationType {
+    #[default]
+    Unmodified = 0,
+    ILModified = 1,
+    ReJITModified = 2,
+}
+
+/// Profiler IL data.
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DacpProfilerILData {
+    pub modificationType: ProfilerILModificationType,
+    pub il: CLRDATA_ADDRESS,
+    pub rejitID: u32,
+}
+
+/// EH clause type enumeration.
+#[repr(u32)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum EHClauseType {
+    #[default]
+    EHFault = 0,
+    EHFinally = 1,
+    EHFilter = 2,
+    EHTyped = 3,
+    EHUnknown = 4,
+}
+
+/// Exception handling info.
+/// Size: 0x58 bytes
+#[repr(C)]
+#[derive(Debug, Clone, Default)]
+pub struct DACEHInfo {
+    pub clauseType: EHClauseType,
+    pub tryStartOffset: CLRDATA_ADDRESS,
+    pub tryEndOffset: CLRDATA_ADDRESS,
+    pub handlerStartOffset: CLRDATA_ADDRESS,
+    pub handlerEndOffset: CLRDATA_ADDRESS,
+    pub isDuplicateClause: i32,
+    pub filterOffset: CLRDATA_ADDRESS,
+    pub isCatchAllHandler: i32,
+    pub moduleAddr: CLRDATA_ADDRESS,
+    pub mtCatch: CLRDATA_ADDRESS,
+    pub tokCatch: u32,
+}
 
 /// Module map type enumeration.
 #[repr(i32)]
