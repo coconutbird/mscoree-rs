@@ -7,7 +7,7 @@
 
 use windows::core::{GUID, HRESULT, IUnknown, IUnknown_Vtbl, PCWSTR, interface};
 
-use super::data_target::CLRDATA_ADDRESS;
+use super::clr_data_target::CLRDATA_ADDRESS;
 
 /// Flags for controlling which memory regions are enumerated.
 pub mod CLRDataEnumMemoryFlags {

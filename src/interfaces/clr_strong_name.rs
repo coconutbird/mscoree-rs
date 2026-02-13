@@ -3,7 +3,7 @@
 //! These interfaces provide strong name key management and signing.
 
 use std::ffi::c_void;
-use windows::core::{HRESULT, IUnknown, IUnknown_Vtbl, interface, PCWSTR};
+use windows::core::{HRESULT, IUnknown, IUnknown_Vtbl, PCWSTR, interface};
 
 /// ICLRStrongName - Strong name signing and verification.
 #[interface("9FD93CCF-3280-4391-B3A9-96E1CDE77C8D")]
@@ -221,10 +221,5 @@ pub unsafe trait ICLRStrongName: IUnknown {
     ) -> HRESULT;
 
     /// Hash assembly file.
-    pub unsafe fn StrongNameHashSize(
-        &self,
-        ulHashAlg: u32,
-        pcbSize: *mut u32,
-    ) -> HRESULT;
+    pub unsafe fn StrongNameHashSize(&self, ulHashAlg: u32, pcbSize: *mut u32) -> HRESULT;
 }
-

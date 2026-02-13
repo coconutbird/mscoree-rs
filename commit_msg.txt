@@ -1,12 +1,14 @@
-Add Fusion/Assembly binding interfaces (legacy .NET Framework)
+Rename interface files to follow clr_ prefix convention
 
-This adds the Global Assembly Cache (GAC) interfaces:
-- IAssemblyCache - Query, install, and uninstall assemblies from GAC
-- IAssemblyCacheItem - Assembly cache installation item
-- IAssemblyName - Assembly identity representation
-- IAssemblyEnum - Enumerate assemblies in the cache
-- IInstallReferenceItem, IInstallReferenceEnum - Install references
-- ASM_CACHE_FLAGS - Cache types (ZAP, GAC, DOWNLOAD, ROOT)
-- ASM_DISPLAY_FLAGS - Assembly display name formatting
-- ASM_NAME - Assembly name property enumeration
-- ASSEMBLY_INFO - Assembly information structure
+Rename files containing ICLRxxx interfaces to use the clr_ prefix:
+- metahost.rs -> clr_metahost.rs
+- runtime_host.rs -> clr_runtime_host.rs
+- runtime_info.rs -> clr_runtime_info.rs
+- data_target.rs -> clr_data_target.rs
+
+This ensures consistent naming across all interface files:
+- clr_* for ICLRxxx interfaces
+- cor_debug_* for ICorDebugxxx interfaces
+- cor_profiler_* for ICorProfilerxxx interfaces
+- xclr_data_* for IXCLRDataxxx interfaces
+- metadata_* for IMetaDataxxx interfaces

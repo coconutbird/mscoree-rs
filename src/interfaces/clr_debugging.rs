@@ -3,7 +3,7 @@
 //! These interfaces are used to attach debuggers to CLR processes.
 
 use std::ffi::c_void;
-use windows::core::{GUID, HRESULT, IUnknown, IUnknown_Vtbl, interface, PCWSTR};
+use windows::core::{GUID, HRESULT, IUnknown, IUnknown_Vtbl, PCWSTR, interface};
 
 /// CLR_DEBUGGING_VERSION structure.
 #[repr(C)]
@@ -111,10 +111,9 @@ pub unsafe trait ICLRDebuggingLibraryProvider3: IUnknown {
         &self,
         pwszFileName: PCWSTR,
         pwszRuntimeModule: PCWSTR,
-        indexType: u32,  // LIBRARY_PROVIDER_INDEX_TYPE
+        indexType: u32, // LIBRARY_PROVIDER_INDEX_TYPE
         dwTimestamp: u32,
         dwSizeOfImage: u32,
         ppResolvedModulePath: *mut PCWSTR,
     ) -> HRESULT;
 }
-

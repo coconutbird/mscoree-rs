@@ -4,7 +4,7 @@
 //! and assembly binding functionality.
 
 use std::ffi::c_void;
-use windows::core::{GUID, HRESULT, IUnknown, IUnknown_Vtbl, interface, PCWSTR};
+use windows::core::{GUID, HRESULT, IUnknown, IUnknown_Vtbl, PCWSTR, interface};
 
 /// Assembly cache install flags.
 #[repr(u32)]
@@ -204,25 +204,13 @@ pub unsafe trait IAssemblyName: IUnknown {
     ) -> HRESULT;
 
     /// Get the assembly name.
-    pub unsafe fn GetName(
-        &self,
-        lpcwBuffer: *mut u32,
-        pwzName: *mut u16,
-    ) -> HRESULT;
+    pub unsafe fn GetName(&self, lpcwBuffer: *mut u32, pwzName: *mut u16) -> HRESULT;
 
     /// Get the assembly version.
-    pub unsafe fn GetVersion(
-        &self,
-        pdwVersionHi: *mut u32,
-        pdwVersionLow: *mut u32,
-    ) -> HRESULT;
+    pub unsafe fn GetVersion(&self, pdwVersionHi: *mut u32, pdwVersionLow: *mut u32) -> HRESULT;
 
     /// Check if two names are equal.
-    pub unsafe fn IsEqual(
-        &self,
-        pName: *mut IAssemblyName,
-        dwCmpFlags: u32,
-    ) -> HRESULT;
+    pub unsafe fn IsEqual(&self, pName: *mut IAssemblyName, dwCmpFlags: u32) -> HRESULT;
 
     /// Clone this assembly name.
     pub unsafe fn Clone(&self, pName: *mut *mut IAssemblyName) -> HRESULT;
@@ -269,4 +257,3 @@ pub unsafe trait IInstallReferenceEnum: IUnknown {
         pvReserved: *mut c_void,
     ) -> HRESULT;
 }
-

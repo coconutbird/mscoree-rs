@@ -5,7 +5,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-use super::data_target::CLRDATA_ADDRESS;
+use super::clr_data_target::CLRDATA_ADDRESS;
 
 /// CLR data process flags.
 #[repr(u32)]

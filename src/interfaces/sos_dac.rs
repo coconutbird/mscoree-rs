@@ -10,7 +10,7 @@
 
 use windows::core::{HRESULT, IUnknown, IUnknown_Vtbl, interface};
 
-use super::data_target::CLRDATA_ADDRESS;
+use super::clr_data_target::CLRDATA_ADDRESS;
 
 // Forward declaration for IXCLRDataModule
 #[interface("88E32849-0A0A-4CB0-9022-7CD2E9E139E2")]

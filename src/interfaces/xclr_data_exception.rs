@@ -5,7 +5,7 @@
 
 use windows::core::{HRESULT, IUnknown, IUnknown_Vtbl, interface};
 
-use super::data_target::CLRDATA_ADDRESS;
+use super::clr_data_target::CLRDATA_ADDRESS;
 
 /// IXCLRDataExceptionState - Represents exception state.
 #[interface("75DA9E4C-BD33-43C8-8F5C-96E8A5241F57")]

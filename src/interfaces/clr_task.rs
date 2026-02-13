@@ -45,11 +45,8 @@ pub unsafe trait ICLRTask: IUnknown {
     pub unsafe fn YieldTask(&self) -> HRESULT;
 
     /// Locate lock owner.
-    pub unsafe fn LocksHeld(
-        &self,
-        pLockCount: *mut usize,
-        pOwningTaskCount: *mut usize,
-    ) -> HRESULT;
+    pub unsafe fn LocksHeld(&self, pLockCount: *mut usize, pOwningTaskCount: *mut usize)
+    -> HRESULT;
 
     /// Set task identifier.
     pub unsafe fn SetTaskIdentifier(&self, dwId: u64) -> HRESULT;
@@ -68,7 +65,8 @@ pub unsafe trait ICLRTask2: IUnknown {
     pub unsafe fn RudeAbort(&self) -> HRESULT;
     pub unsafe fn NeedsPriorityScheduling(&self, pbNeedsPriorityScheduling: *mut i32) -> HRESULT;
     pub unsafe fn YieldTask(&self) -> HRESULT;
-    pub unsafe fn LocksHeld(&self, pLockCount: *mut usize, pOwningTaskCount: *mut usize) -> HRESULT;
+    pub unsafe fn LocksHeld(&self, pLockCount: *mut usize, pOwningTaskCount: *mut usize)
+    -> HRESULT;
     pub unsafe fn SetTaskIdentifier(&self, dwId: u64) -> HRESULT;
 
     // ICLRTask2 specific
@@ -89,11 +87,7 @@ pub unsafe trait IHostTask: IUnknown {
     pub unsafe fn Alert(&self) -> HRESULT;
 
     /// Join this task (wait for completion).
-    pub unsafe fn Join(
-        &self,
-        dwMilliseconds: u32,
-        option: u32,
-    ) -> HRESULT;
+    pub unsafe fn Join(&self, dwMilliseconds: u32, option: u32) -> HRESULT;
 
     /// Set priority.
     pub unsafe fn SetPriority(&self, newPriority: i32) -> HRESULT;
@@ -151,4 +145,3 @@ pub unsafe trait IHostTaskManager: IUnknown {
     /// Set UI locale.
     pub unsafe fn SetUILocale(&self, lcid: u32) -> HRESULT;
 }
-

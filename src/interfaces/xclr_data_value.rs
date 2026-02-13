@@ -5,7 +5,7 @@
 
 use windows::core::{HRESULT, IUnknown, IUnknown_Vtbl, interface};
 
-use super::data_target::CLRDATA_ADDRESS;
+use super::clr_data_target::CLRDATA_ADDRESS;
 use super::xclr_data_process::CLRDATA_ENUM;
 
 /// IXCLRDataValue - Represents a CLR value.

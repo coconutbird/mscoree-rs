@@ -56,13 +56,21 @@ pub unsafe trait ICorProfilerCallback: IUnknown {
     pub unsafe fn AppDomainCreationStarted(&self, appDomainId: usize) -> HRESULT;
 
     /// Called when an AppDomain creation finishes.
-    pub unsafe fn AppDomainCreationFinished(&self, appDomainId: usize, hrStatus: HRESULT) -> HRESULT;
+    pub unsafe fn AppDomainCreationFinished(
+        &self,
+        appDomainId: usize,
+        hrStatus: HRESULT,
+    ) -> HRESULT;
 
     /// Called when an AppDomain shutdown starts.
     pub unsafe fn AppDomainShutdownStarted(&self, appDomainId: usize) -> HRESULT;
 
     /// Called when an AppDomain shutdown finishes.
-    pub unsafe fn AppDomainShutdownFinished(&self, appDomainId: usize, hrStatus: HRESULT) -> HRESULT;
+    pub unsafe fn AppDomainShutdownFinished(
+        &self,
+        appDomainId: usize,
+        hrStatus: HRESULT,
+    ) -> HRESULT;
 
     /// Called when an assembly load starts.
     pub unsafe fn AssemblyLoadStarted(&self, assemblyId: usize) -> HRESULT;
@@ -110,16 +118,31 @@ pub unsafe trait ICorProfilerCallback: IUnknown {
     pub unsafe fn JITCompilationStarted(&self, functionId: usize, fIsSafeToBlock: i32) -> HRESULT;
 
     /// Called when JIT compilation finishes.
-    pub unsafe fn JITCompilationFinished(&self, functionId: usize, hrStatus: HRESULT, fIsSafeToBlock: i32) -> HRESULT;
+    pub unsafe fn JITCompilationFinished(
+        &self,
+        functionId: usize,
+        hrStatus: HRESULT,
+        fIsSafeToBlock: i32,
+    ) -> HRESULT;
 
     /// Called when JIT caching starts.
-    pub unsafe fn JITCachedFunctionSearchStarted(&self, functionId: usize, pbUseCachedFunction: *mut i32) -> HRESULT;
+    pub unsafe fn JITCachedFunctionSearchStarted(
+        &self,
+        functionId: usize,
+        pbUseCachedFunction: *mut i32,
+    ) -> HRESULT;
 
     /// Called when JIT caching finishes.
-    pub unsafe fn JITCachedFunctionSearchFinished(&self, functionId: usize, result: u32) -> HRESULT;
+    pub unsafe fn JITCachedFunctionSearchFinished(&self, functionId: usize, result: u32)
+    -> HRESULT;
 
     /// Called when JIT inlining starts.
-    pub unsafe fn JITInlining(&self, callerId: usize, calleeId: usize, pfShouldInline: *mut i32) -> HRESULT;
+    pub unsafe fn JITInlining(
+        &self,
+        callerId: usize,
+        calleeId: usize,
+        pfShouldInline: *mut i32,
+    ) -> HRESULT;
 
     /// Called when a thread is created.
     pub unsafe fn ThreadCreated(&self, threadId: usize) -> HRESULT;
@@ -128,22 +151,38 @@ pub unsafe trait ICorProfilerCallback: IUnknown {
     pub unsafe fn ThreadDestroyed(&self, threadId: usize) -> HRESULT;
 
     /// Called when a thread is assigned an OS thread ID.
-    pub unsafe fn ThreadAssignedToOSThread(&self, managedThreadId: usize, osThreadId: u32) -> HRESULT;
+    pub unsafe fn ThreadAssignedToOSThread(
+        &self,
+        managedThreadId: usize,
+        osThreadId: u32,
+    ) -> HRESULT;
 
     /// Called when a remoting client invokes.
     pub unsafe fn RemotingClientInvocationStarted(&self) -> HRESULT;
 
     /// Called when remoting client is sending.
-    pub unsafe fn RemotingClientSendingMessage(&self, pCookie: *const GUID, fIsAsync: i32) -> HRESULT;
+    pub unsafe fn RemotingClientSendingMessage(
+        &self,
+        pCookie: *const GUID,
+        fIsAsync: i32,
+    ) -> HRESULT;
 
     /// Called when remoting client receives.
-    pub unsafe fn RemotingClientReceivingReply(&self, pCookie: *const GUID, fIsAsync: i32) -> HRESULT;
+    pub unsafe fn RemotingClientReceivingReply(
+        &self,
+        pCookie: *const GUID,
+        fIsAsync: i32,
+    ) -> HRESULT;
 
     /// Called when remoting client invocation finishes.
     pub unsafe fn RemotingClientInvocationFinished(&self) -> HRESULT;
 
     /// Called when remoting server receives.
-    pub unsafe fn RemotingServerReceivingMessage(&self, pCookie: *const GUID, fIsAsync: i32) -> HRESULT;
+    pub unsafe fn RemotingServerReceivingMessage(
+        &self,
+        pCookie: *const GUID,
+        fIsAsync: i32,
+    ) -> HRESULT;
 
     /// Called when remoting server invocation starts.
     pub unsafe fn RemotingServerInvocationStarted(&self) -> HRESULT;
@@ -152,7 +191,8 @@ pub unsafe trait ICorProfilerCallback: IUnknown {
     pub unsafe fn RemotingServerInvocationReturned(&self) -> HRESULT;
 
     /// Called when remoting server sends.
-    pub unsafe fn RemotingServerSendingReply(&self, pCookie: *const GUID, fIsAsync: i32) -> HRESULT;
+    pub unsafe fn RemotingServerSendingReply(&self, pCookie: *const GUID, fIsAsync: i32)
+    -> HRESULT;
 
     /// Called when an unmanaged-to-managed transition occurs.
     pub unsafe fn UnmanagedToManagedTransition(&self, functionId: usize, reason: u32) -> HRESULT;
@@ -211,11 +251,7 @@ pub unsafe trait ICorProfilerCallback: IUnknown {
     ) -> HRESULT;
 
     /// Called when a root reference is collected.
-    pub unsafe fn RootReferences(
-        &self,
-        cRootRefs: u32,
-        rootRefIds: *const usize,
-    ) -> HRESULT;
+    pub unsafe fn RootReferences(&self, cRootRefs: u32, rootRefIds: *const usize) -> HRESULT;
 
     /// Called when an exception is thrown.
     pub unsafe fn ExceptionThrown(&self, thrownObjectId: usize) -> HRESULT;
@@ -260,10 +296,21 @@ pub unsafe trait ICorProfilerCallback: IUnknown {
     pub unsafe fn ExceptionCatcherLeave(&self) -> HRESULT;
 
     /// Called when a COM class info is requested.
-    pub unsafe fn COMClassicVTableCreated(&self, wrappedClassId: usize, implementedIID: *const GUID, pVTable: *const c_void, cSlots: u32) -> HRESULT;
+    pub unsafe fn COMClassicVTableCreated(
+        &self,
+        wrappedClassId: usize,
+        implementedIID: *const GUID,
+        pVTable: *const c_void,
+        cSlots: u32,
+    ) -> HRESULT;
 
     /// Called when a COM class is destroyed.
-    pub unsafe fn COMClassicVTableDestroyed(&self, wrappedClassId: usize, implementedIID: *const GUID, pVTable: *const c_void) -> HRESULT;
+    pub unsafe fn COMClassicVTableDestroyed(
+        &self,
+        wrappedClassId: usize,
+        implementedIID: *const GUID,
+        pVTable: *const c_void,
+    ) -> HRESULT;
 
     /// Called when exception CLR catcher enters.
     pub unsafe fn ExceptionCLRCatcherFound(&self) -> HRESULT;
@@ -271,4 +318,3 @@ pub unsafe trait ICorProfilerCallback: IUnknown {
     /// Called when exception CLR catcher executes.
     pub unsafe fn ExceptionCLRCatcherExecute(&self) -> HRESULT;
 }
-

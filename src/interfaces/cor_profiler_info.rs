@@ -12,10 +12,20 @@ pub unsafe trait ICorProfilerInfo: IUnknown {
     pub unsafe fn GetClassFromObject(&self, objectId: usize, pClassId: *mut usize) -> HRESULT;
 
     /// Get the class from a token.
-    pub unsafe fn GetClassFromToken(&self, moduleId: usize, typeDef: u32, pClassId: *mut usize) -> HRESULT;
+    pub unsafe fn GetClassFromToken(
+        &self,
+        moduleId: usize,
+        typeDef: u32,
+        pClassId: *mut usize,
+    ) -> HRESULT;
 
     /// Get the code info.
-    pub unsafe fn GetCodeInfo(&self, functionId: usize, pStart: *mut *const u8, pcSize: *mut u32) -> HRESULT;
+    pub unsafe fn GetCodeInfo(
+        &self,
+        functionId: usize,
+        pStart: *mut *const u8,
+        pcSize: *mut u32,
+    ) -> HRESULT;
 
     /// Get the event mask.
     pub unsafe fn GetEventMask(&self, pdwEvents: *mut u32) -> HRESULT;
@@ -24,10 +34,19 @@ pub unsafe trait ICorProfilerInfo: IUnknown {
     pub unsafe fn GetFunctionFromIP(&self, ip: *const u8, pFunctionId: *mut usize) -> HRESULT;
 
     /// Get the function from token.
-    pub unsafe fn GetFunctionFromToken(&self, moduleId: usize, token: u32, pFunctionId: *mut usize) -> HRESULT;
+    pub unsafe fn GetFunctionFromToken(
+        &self,
+        moduleId: usize,
+        token: u32,
+        pFunctionId: *mut usize,
+    ) -> HRESULT;
 
     /// Get the handle from thread.
-    pub unsafe fn GetHandleFromThread(&self, threadId: usize, phThread: *mut *mut c_void) -> HRESULT;
+    pub unsafe fn GetHandleFromThread(
+        &self,
+        threadId: usize,
+        phThread: *mut *mut c_void,
+    ) -> HRESULT;
 
     /// Get the object size.
     pub unsafe fn GetObjectSize(&self, objectId: usize, pcSize: *mut u32) -> HRESULT;
@@ -177,7 +196,11 @@ pub unsafe trait ICorProfilerInfo: IUnknown {
     pub unsafe fn GetThreadContext(&self, threadId: usize, pContextId: *mut usize) -> HRESULT;
 
     /// Begin inproc debugging.
-    pub unsafe fn BeginInprocDebugging(&self, fThisThreadOnly: i32, pdwProfilerContext: *mut u32) -> HRESULT;
+    pub unsafe fn BeginInprocDebugging(
+        &self,
+        fThisThreadOnly: i32,
+        pdwProfilerContext: *mut u32,
+    ) -> HRESULT;
 
     /// End inproc debugging.
     pub unsafe fn EndInprocDebugging(&self, dwProfilerContext: u32) -> HRESULT;
@@ -197,38 +220,145 @@ pub unsafe trait ICorProfilerInfo: IUnknown {
 pub unsafe trait ICorProfilerInfo2: IUnknown {
     // ICorProfilerInfo methods (inherited, not repeated here for brevity)
     pub unsafe fn GetClassFromObject(&self, objectId: usize, pClassId: *mut usize) -> HRESULT;
-    pub unsafe fn GetClassFromToken(&self, moduleId: usize, typeDef: u32, pClassId: *mut usize) -> HRESULT;
-    pub unsafe fn GetCodeInfo(&self, functionId: usize, pStart: *mut *const u8, pcSize: *mut u32) -> HRESULT;
+    pub unsafe fn GetClassFromToken(
+        &self,
+        moduleId: usize,
+        typeDef: u32,
+        pClassId: *mut usize,
+    ) -> HRESULT;
+    pub unsafe fn GetCodeInfo(
+        &self,
+        functionId: usize,
+        pStart: *mut *const u8,
+        pcSize: *mut u32,
+    ) -> HRESULT;
     pub unsafe fn GetEventMask(&self, pdwEvents: *mut u32) -> HRESULT;
     pub unsafe fn GetFunctionFromIP(&self, ip: *const u8, pFunctionId: *mut usize) -> HRESULT;
-    pub unsafe fn GetFunctionFromToken(&self, moduleId: usize, token: u32, pFunctionId: *mut usize) -> HRESULT;
-    pub unsafe fn GetHandleFromThread(&self, threadId: usize, phThread: *mut *mut c_void) -> HRESULT;
+    pub unsafe fn GetFunctionFromToken(
+        &self,
+        moduleId: usize,
+        token: u32,
+        pFunctionId: *mut usize,
+    ) -> HRESULT;
+    pub unsafe fn GetHandleFromThread(
+        &self,
+        threadId: usize,
+        phThread: *mut *mut c_void,
+    ) -> HRESULT;
     pub unsafe fn GetObjectSize(&self, objectId: usize, pcSize: *mut u32) -> HRESULT;
-    pub unsafe fn IsArrayClass(&self, classId: usize, pBaseElemType: *mut u32, pBaseClassId: *mut usize, pcRank: *mut u32) -> HRESULT;
+    pub unsafe fn IsArrayClass(
+        &self,
+        classId: usize,
+        pBaseElemType: *mut u32,
+        pBaseClassId: *mut usize,
+        pcRank: *mut u32,
+    ) -> HRESULT;
     pub unsafe fn GetThreadInfo(&self, threadId: usize, pdwWin32ThreadId: *mut u32) -> HRESULT;
     pub unsafe fn GetCurrentThreadID(&self, pThreadId: *mut usize) -> HRESULT;
-    pub unsafe fn GetClassIDInfo(&self, classId: usize, pModuleId: *mut usize, pTypeDefToken: *mut u32) -> HRESULT;
-    pub unsafe fn GetFunctionInfo(&self, functionId: usize, pClassId: *mut usize, pModuleId: *mut usize, pToken: *mut u32) -> HRESULT;
+    pub unsafe fn GetClassIDInfo(
+        &self,
+        classId: usize,
+        pModuleId: *mut usize,
+        pTypeDefToken: *mut u32,
+    ) -> HRESULT;
+    pub unsafe fn GetFunctionInfo(
+        &self,
+        functionId: usize,
+        pClassId: *mut usize,
+        pModuleId: *mut usize,
+        pToken: *mut u32,
+    ) -> HRESULT;
     pub unsafe fn SetEventMask(&self, dwEvents: u32) -> HRESULT;
-    pub unsafe fn SetEnterLeaveFunctionHooks(&self, pFuncEnter: *const c_void, pFuncLeave: *const c_void, pFuncTailcall: *const c_void) -> HRESULT;
+    pub unsafe fn SetEnterLeaveFunctionHooks(
+        &self,
+        pFuncEnter: *const c_void,
+        pFuncLeave: *const c_void,
+        pFuncTailcall: *const c_void,
+    ) -> HRESULT;
     pub unsafe fn SetFunctionIDMapper(&self, pFunc: *const c_void) -> HRESULT;
-    pub unsafe fn GetTokenAndMetaDataFromFunction(&self, functionId: usize, riid: *const GUID, ppImport: *mut *mut IUnknown, pToken: *mut u32) -> HRESULT;
-    pub unsafe fn GetModuleInfo(&self, moduleId: usize, ppBaseLoadAddress: *mut *const u8, cchName: u32, pcchName: *mut u32, szName: *mut u16, pAssemblyId: *mut usize) -> HRESULT;
-    pub unsafe fn GetModuleMetaData(&self, moduleId: usize, dwOpenFlags: u32, riid: *const GUID, ppOut: *mut *mut IUnknown) -> HRESULT;
-    pub unsafe fn GetILFunctionBody(&self, moduleId: usize, methodId: u32, ppMethodHeader: *mut *const u8, pcbMethodSize: *mut u32) -> HRESULT;
-    pub unsafe fn GetILFunctionBodyAllocator(&self, moduleId: usize, ppMalloc: *mut *mut IUnknown) -> HRESULT;
-    pub unsafe fn SetILFunctionBody(&self, moduleId: usize, methodid: u32, pbNewILMethodHeader: *const u8) -> HRESULT;
-    pub unsafe fn GetAppDomainInfo(&self, appDomainId: usize, cchName: u32, pcchName: *mut u32, szName: *mut u16, pProcessId: *mut usize) -> HRESULT;
-    pub unsafe fn GetAssemblyInfo(&self, assemblyId: usize, cchName: u32, pcchName: *mut u32, szName: *mut u16, pAppDomainId: *mut usize, pModuleId: *mut usize) -> HRESULT;
+    pub unsafe fn GetTokenAndMetaDataFromFunction(
+        &self,
+        functionId: usize,
+        riid: *const GUID,
+        ppImport: *mut *mut IUnknown,
+        pToken: *mut u32,
+    ) -> HRESULT;
+    pub unsafe fn GetModuleInfo(
+        &self,
+        moduleId: usize,
+        ppBaseLoadAddress: *mut *const u8,
+        cchName: u32,
+        pcchName: *mut u32,
+        szName: *mut u16,
+        pAssemblyId: *mut usize,
+    ) -> HRESULT;
+    pub unsafe fn GetModuleMetaData(
+        &self,
+        moduleId: usize,
+        dwOpenFlags: u32,
+        riid: *const GUID,
+        ppOut: *mut *mut IUnknown,
+    ) -> HRESULT;
+    pub unsafe fn GetILFunctionBody(
+        &self,
+        moduleId: usize,
+        methodId: u32,
+        ppMethodHeader: *mut *const u8,
+        pcbMethodSize: *mut u32,
+    ) -> HRESULT;
+    pub unsafe fn GetILFunctionBodyAllocator(
+        &self,
+        moduleId: usize,
+        ppMalloc: *mut *mut IUnknown,
+    ) -> HRESULT;
+    pub unsafe fn SetILFunctionBody(
+        &self,
+        moduleId: usize,
+        methodid: u32,
+        pbNewILMethodHeader: *const u8,
+    ) -> HRESULT;
+    pub unsafe fn GetAppDomainInfo(
+        &self,
+        appDomainId: usize,
+        cchName: u32,
+        pcchName: *mut u32,
+        szName: *mut u16,
+        pProcessId: *mut usize,
+    ) -> HRESULT;
+    pub unsafe fn GetAssemblyInfo(
+        &self,
+        assemblyId: usize,
+        cchName: u32,
+        pcchName: *mut u32,
+        szName: *mut u16,
+        pAppDomainId: *mut usize,
+        pModuleId: *mut usize,
+    ) -> HRESULT;
     pub unsafe fn SetFunctionReJIT(&self, functionId: usize) -> HRESULT;
     pub unsafe fn ForceGC(&self) -> HRESULT;
-    pub unsafe fn SetILInstrumentedCodeMap(&self, functionId: usize, fStartJit: i32, cILMapEntries: u32, rgILMapEntries: *const c_void) -> HRESULT;
+    pub unsafe fn SetILInstrumentedCodeMap(
+        &self,
+        functionId: usize,
+        fStartJit: i32,
+        cILMapEntries: u32,
+        rgILMapEntries: *const c_void,
+    ) -> HRESULT;
     pub unsafe fn GetInprocInspectionInterface(&self, ppicd: *mut *mut IUnknown) -> HRESULT;
     pub unsafe fn GetInprocInspectionIThisThread(&self, ppicd: *mut *mut IUnknown) -> HRESULT;
     pub unsafe fn GetThreadContext(&self, threadId: usize, pContextId: *mut usize) -> HRESULT;
-    pub unsafe fn BeginInprocDebugging(&self, fThisThreadOnly: i32, pdwProfilerContext: *mut u32) -> HRESULT;
+    pub unsafe fn BeginInprocDebugging(
+        &self,
+        fThisThreadOnly: i32,
+        pdwProfilerContext: *mut u32,
+    ) -> HRESULT;
     pub unsafe fn EndInprocDebugging(&self, dwProfilerContext: u32) -> HRESULT;
-    pub unsafe fn GetILToNativeMapping(&self, functionId: usize, cMap: u32, pcMap: *mut u32, map: *mut c_void) -> HRESULT;
+    pub unsafe fn GetILToNativeMapping(
+        &self,
+        functionId: usize,
+        cMap: u32,
+        pcMap: *mut u32,
+        map: *mut c_void,
+    ) -> HRESULT;
 
     // ICorProfilerInfo2 specific methods
     /// Do stack snapshot.
@@ -341,18 +471,10 @@ pub unsafe trait ICorProfilerInfo2: IUnknown {
     ) -> HRESULT;
 
     /// Get box class layout.
-    pub unsafe fn GetBoxClassLayout(
-        &self,
-        classId: usize,
-        pBufferOffset: *mut u32,
-    ) -> HRESULT;
+    pub unsafe fn GetBoxClassLayout(&self, classId: usize, pBufferOffset: *mut u32) -> HRESULT;
 
     /// Get thread app domain.
-    pub unsafe fn GetThreadAppDomain(
-        &self,
-        threadId: usize,
-        pAppDomainId: *mut usize,
-    ) -> HRESULT;
+    pub unsafe fn GetThreadAppDomain(&self, threadId: usize, pAppDomainId: *mut usize) -> HRESULT;
 
     /// Get RVA static address.
     pub unsafe fn GetRVAStaticAddress(
@@ -406,16 +528,8 @@ pub unsafe trait ICorProfilerInfo2: IUnknown {
     ) -> HRESULT;
 
     /// Get object generation.
-    pub unsafe fn GetObjectGeneration(
-        &self,
-        objectId: usize,
-        range: *mut c_void,
-    ) -> HRESULT;
+    pub unsafe fn GetObjectGeneration(&self, objectId: usize, range: *mut c_void) -> HRESULT;
 
     /// Get notified exception clause info.
-    pub unsafe fn GetNotifiedExceptionClauseInfo(
-        &self,
-        pinfo: *mut c_void,
-    ) -> HRESULT;
+    pub unsafe fn GetNotifiedExceptionClauseInfo(&self, pinfo: *mut c_void) -> HRESULT;
 }
-
