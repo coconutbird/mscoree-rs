@@ -1,19 +1,10 @@
-Add ICorDebug family interfaces for managed debugging
+Add ICorProfiler family interfaces for .NET profiling
 
-This adds the core debugging interfaces from mscordbi.dll:
-- ICorDebug, ICorDebug2, ICorDebugController
-- ICorDebugProcess through ICorDebugProcess11
-- ICorDebugThread through ICorDebugThread4
-- ICorDebugAppDomain through ICorDebugAppDomain4
-- ICorDebugAssembly through ICorDebugAssembly3
-- ICorDebugModule through ICorDebugModule4
-- ICorDebugFunction through ICorDebugFunction4
-- ICorDebugFrame, ICorDebugILFrame (1-4), ICorDebugNativeFrame
-- ICorDebugValue (1-3), ICorDebugGenericValue, ICorDebugReferenceValue
-- ICorDebugHeapValue (1-3)
-- ICorDebugManagedCallback through ICorDebugManagedCallback4
-- ICorDebugStepper (1-2)
-- ICorDebugBreakpoint, ICorDebugFunctionBreakpoint, etc.
-- ICorDebugEval (1-2)
-- ICorDebugCode (1-4), ICorDebugILCode (1-2)
-- ICorDebugChain, ICorDebugRegisterSet (1-2)
+This adds the core profiler interfaces from mscoree:
+- ICorProfilerCallback - ~50 callback methods for profiler events
+  (AppDomain, Assembly, Module, Class, Thread, JIT, GC, Exception events)
+- ICorProfilerInfo - Query interface for profilers (~30 methods)
+- ICorProfilerInfo2 - Extended query interface with stack snapshots,
+  generics support, and additional inspection methods
+- CorPrfMonitor enum - Profiler event flags
+- CorPrfGcGeneration enum - GC generation values
