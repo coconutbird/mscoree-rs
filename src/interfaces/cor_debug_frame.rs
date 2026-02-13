@@ -1,6 +1,5 @@
 //! ICorDebugFrame and ICorDebugCode interface definitions.
 
-use std::ffi::c_void;
 use windows::core::{HRESULT, IUnknown, IUnknown_Vtbl, interface};
 
 /// CorDebugMappingResult - Result of IL to native mapping
