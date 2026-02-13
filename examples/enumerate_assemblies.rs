@@ -19,14 +19,17 @@
 //! This example implements ICLRDataTarget using a manual vtable-based approach
 //! to read memory from the target process.
 
+use std::collections::HashMap;
 use std::env;
 use std::ffi::c_void;
 use std::ptr;
 use std::sync::atomic::{AtomicU32, Ordering};
+use std::sync::RwLock;
 
 use windows::core::{GUID, HRESULT, IUnknown, Interface};
-use windows::Win32::Foundation::{HANDLE, E_NOTIMPL, S_OK, E_FAIL, CloseHandle};
+use windows::Win32::Foundation::{HANDLE, E_NOTIMPL, S_OK, E_FAIL, CloseHandle, MAX_PATH};
 use windows::Win32::System::Diagnostics::Debug::{ReadProcessMemory, WriteProcessMemory};
+use windows::Win32::System::ProcessStatus::{EnumProcessModulesEx, GetModuleBaseNameW, GetModuleInformation, LIST_MODULES_ALL, MODULEINFO};
 use windows::Win32::System::Threading::{OpenProcess, PROCESS_VM_READ, PROCESS_VM_WRITE, PROCESS_QUERY_INFORMATION};
 use windows::Win32::System::LibraryLoader::{LoadLibraryW, GetProcAddress};
 
@@ -68,12 +71,15 @@ struct ICLRDataTargetVtbl {
 }
 
 /// Our implementation of ICLRDataTarget for live process memory reading
-#[repr(C)]
+#[allow(dead_code)]
 struct LiveProcessDataTarget {
+    /// Pointer to vtable - must be first field for COM compatibility
     vtbl: *const ICLRDataTargetVtbl,
     ref_count: AtomicU32,
     process_handle: HANDLE,
     pointer_size: u32,
+    /// Cache of module name -> base address (populated on first GetImageBase call)
+    module_cache: RwLock<HashMap<String, u64>>,
 }
 
 // Static vtable instance
@@ -104,7 +110,53 @@ impl LiveProcessDataTarget {
             pointer_size: 8,
             #[cfg(target_arch = "x86")]
             pointer_size: 4,
+            module_cache: RwLock::new(HashMap::new()),
         })
+    }
+
+    /// Populate the module cache by enumerating all modules in the process
+    fn populate_module_cache(&self) {
+        let mut cache = self.module_cache.write().unwrap();
+        if !cache.is_empty() {
+            return; // Already populated
+        }
+
+        unsafe {
+            let mut modules = [std::mem::zeroed::<windows::Win32::Foundation::HMODULE>(); 1024];
+            let mut cb_needed: u32 = 0;
+
+            if EnumProcessModulesEx(
+                self.process_handle,
+                modules.as_mut_ptr(),
+                (modules.len() * std::mem::size_of::<windows::Win32::Foundation::HMODULE>()) as u32,
+                &mut cb_needed,
+                LIST_MODULES_ALL,
+            ).is_ok() {
+                let module_count = cb_needed as usize / std::mem::size_of::<windows::Win32::Foundation::HMODULE>();
+
+                for i in 0..module_count {
+                    let module = modules[i];
+                    let mut name_buf = [0u16; MAX_PATH as usize];
+
+                    let name_len = GetModuleBaseNameW(self.process_handle, Some(module), &mut name_buf);
+                    if name_len > 0 {
+                        let name = String::from_utf16_lossy(&name_buf[..name_len as usize]);
+                        let name_lower = name.to_lowercase();
+
+                        let mut mod_info: MODULEINFO = std::mem::zeroed();
+                        if GetModuleInformation(
+                            self.process_handle,
+                            module,
+                            &mut mod_info,
+                            std::mem::size_of::<MODULEINFO>() as u32,
+                        ).is_ok() {
+                            let base_addr = mod_info.lpBaseOfDll as u64;
+                            cache.insert(name_lower, base_addr);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     unsafe extern "system" fn query_interface(
@@ -158,13 +210,48 @@ impl LiveProcessDataTarget {
     }
 
     unsafe extern "system" fn get_image_base(
-        _this: *mut c_void,
-        _image_path: *const u16,
+        this: *mut c_void,
+        image_path: *const u16,
         base_address: *mut u64,
     ) -> HRESULT {
-        // For a full implementation, enumerate modules to find the base address
-        unsafe { *base_address = 0; }
-        E_NOTIMPL
+        let target = unsafe { &*(this as *const Self) };
+
+        // Convert the image path to a string
+        let path_str = unsafe {
+            let mut len = 0;
+            while *image_path.add(len) != 0 {
+                len += 1;
+            }
+            let slice = std::slice::from_raw_parts(image_path, len);
+            String::from_utf16_lossy(slice)
+        };
+
+        // Extract just the filename from the path
+        let filename = path_str
+            .rsplit(|c| c == '\\' || c == '/')
+            .next()
+            .unwrap_or(&path_str)
+            .to_lowercase();
+
+        // Populate the module cache if needed
+        target.populate_module_cache();
+
+        // Look up the module in the cache
+        let cache = target.module_cache.read().unwrap();
+        if let Some(&addr) = cache.get(&filename) {
+            unsafe { *base_address = addr; }
+            S_OK
+        } else {
+            // Try partial match (e.g., "clr.dll" might be requested as "clr")
+            for (name, &addr) in cache.iter() {
+                if name.starts_with(&filename) || filename.starts_with(name.trim_end_matches(".dll")) {
+                    unsafe { *base_address = addr; }
+                    return S_OK;
+                }
+            }
+            unsafe { *base_address = 0; }
+            E_FAIL
+        }
     }
 
     unsafe extern "system" fn read_virtual(
@@ -266,16 +353,69 @@ fn wide_to_string(buffer: &[u16], len: u32) -> String {
     String::from_utf16_lossy(&slice[..end])
 }
 
+/// Find the CLR module path in the target process and return the DAC DLL path
+fn find_dac_path(process_handle: HANDLE) -> Option<String> {
+    use windows::Win32::System::ProcessStatus::{EnumProcessModulesEx, GetModuleFileNameExW, LIST_MODULES_ALL};
+
+    unsafe {
+        let mut modules = [std::mem::zeroed::<windows::Win32::Foundation::HMODULE>(); 1024];
+        let mut cb_needed: u32 = 0;
+
+        if EnumProcessModulesEx(
+            process_handle,
+            modules.as_mut_ptr(),
+            (modules.len() * std::mem::size_of::<windows::Win32::Foundation::HMODULE>()) as u32,
+            &mut cb_needed,
+            LIST_MODULES_ALL,
+        ).is_ok() {
+            let module_count = cb_needed as usize / std::mem::size_of::<windows::Win32::Foundation::HMODULE>();
+
+            for i in 0..module_count {
+                let module = modules[i];
+                let mut path_buf = [0u16; 1024];
+
+                let path_len = GetModuleFileNameExW(Some(process_handle), Some(module), &mut path_buf);
+                if path_len > 0 {
+                    let path = String::from_utf16_lossy(&path_buf[..path_len as usize]);
+                    let path_lower = path.to_lowercase();
+
+                    // Look for CLR modules
+                    if path_lower.ends_with("coreclr.dll") {
+                        // .NET Core/.NET 5+ - DAC is mscordaccore.dll in same directory
+                        if let Some(dir) = std::path::Path::new(&path).parent() {
+                            let dac_path = dir.join("mscordaccore.dll");
+                            if dac_path.exists() {
+                                return Some(dac_path.to_string_lossy().to_string());
+                            }
+                        }
+                    } else if path_lower.ends_with("clr.dll") {
+                        // .NET Framework - DAC is mscordacwks.dll in same directory
+                        if let Some(dir) = std::path::Path::new(&path).parent() {
+                            let dac_path = dir.join("mscordacwks.dll");
+                            if dac_path.exists() {
+                                return Some(dac_path.to_string_lossy().to_string());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    None
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
 
     if args.len() < 2 {
-        eprintln!("Usage: {} <PID>", args[0]);
+        eprintln!("Usage: {} <PID> [DAC_PATH]", args[0]);
         eprintln!("  PID: Process ID of a running .NET process");
+        eprintln!("  DAC_PATH: Optional path to mscordaccore.dll or mscordacwks.dll");
         std::process::exit(1);
     }
 
     let pid: u32 = args[1].parse().map_err(|_| "Invalid PID")?;
+    let dac_path_arg = args.get(2).cloned();
 
     println!("Enumerating .NET assemblies in process {}", pid);
     println!("============================================\n");
@@ -296,23 +436,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let data_target = LiveProcessDataTarget::new(process_handle);
         let data_target_ptr = Box::into_raw(data_target) as *mut c_void;
 
-        // Load the DAC DLL
-        // For .NET Framework, use mscordacwks.dll
-        // For .NET Core/.NET 5+, use mscordaccore.dll
-        // The DLL should be loaded from the same directory as the CLR
-        let dac_path = windows::core::w!("mscordacwks.dll");
-        let dac_module = LoadLibraryW(dac_path);
-
-        let dac_module = if let Ok(module) = dac_module {
-            println!("Loaded mscordacwks.dll");
-            module
+        // Find and load the DAC DLL
+        let dac_path = if let Some(path) = dac_path_arg {
+            println!("Using provided DAC path: {}", path);
+            path
+        } else if let Some(path) = find_dac_path(process_handle) {
+            println!("Found DAC at: {}", path);
+            path
         } else {
-            // Try .NET Core DAC
-            let dac_path_core = windows::core::w!("mscordaccore.dll");
-            let module = LoadLibraryW(dac_path_core)?;
-            println!("Loaded mscordaccore.dll");
-            module
+            return Err("Could not find DAC DLL. Please provide the path as second argument.\n\
+                       For .NET Core: path to mscordaccore.dll\n\
+                       For .NET Framework: path to mscordacwks.dll".into());
         };
+
+        // Convert to wide string and load
+        let dac_path_wide: Vec<u16> = dac_path.encode_utf16().chain(std::iter::once(0)).collect();
+        let dac_module = LoadLibraryW(windows::core::PCWSTR::from_raw(dac_path_wide.as_ptr()))?;
+        println!("Loaded DAC DLL successfully");
 
         // Get CLRDataCreateInstance function
         let proc_name = windows::core::s!("CLRDataCreateInstance");
