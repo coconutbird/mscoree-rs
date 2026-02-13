@@ -52,3 +52,39 @@ pub const IID_ICLRDataTarget2: GUID = GUID::from_u128(0x6d05fae3_189c_4630_a6dc_
 
 /// IID for ICLRDataTarget3 interface
 pub const IID_ICLRDataTarget3: GUID = GUID::from_u128(0xa5664f95_0af4_4a1b_960e_2f3346b4214c);
+
+/// IID for IXCLRDataProcess interface
+pub const IID_IXCLRDataProcess: GUID = GUID::from_u128(0x5c552ab6_fc09_4cb3_8e36_22fa03c798b7);
+
+/// IID for IXCLRDataProcess2 interface
+pub const IID_IXCLRDataProcess2: GUID = GUID::from_u128(0x5c552ab6_fc09_4cb3_8e36_22fa03c798b8);
+
+/// IID for IXCLRDataTask interface
+pub const IID_IXCLRDataTask: GUID = GUID::from_u128(0xa5b0beea_ec62_4618_8012_a24ffc23934c);
+
+/// IID for IXCLRDataAppDomain interface
+pub const IID_IXCLRDataAppDomain: GUID = GUID::from_u128(0x7ca04601_c702_4670_a63c_fa44f7da7bd5);
+
+/// IID for IXCLRDataAssembly interface
+pub const IID_IXCLRDataAssembly: GUID = GUID::from_u128(0x2fa17588_43c2_46ab_9b51_c8f01e39c9ac);
+
+/// IID for IXCLRDataModule interface
+pub const IID_IXCLRDataModule: GUID = GUID::from_u128(0x88e32849_0a0a_4cb0_9022_7cd2e9e139e2);
+
+/// IID for IXCLRDataMethodInstance interface
+pub const IID_IXCLRDataMethodInstance: GUID = GUID::from_u128(0xecd73800_22ca_4b0d_ab55_e9ba7e6318a5);
+
+/// IID for IXCLRDataMethodDefinition interface
+pub const IID_IXCLRDataMethodDefinition: GUID = GUID::from_u128(0xaaf60008_fb2c_420b_8fb1_42d244a54a97);
+
+/// IID for IXCLRDataValue interface
+pub const IID_IXCLRDataValue: GUID = GUID::from_u128(0x96ec93c7_1000_4e93_8991_98d8766e6666);
+
+/// IID for IXCLRDataExceptionState interface
+pub const IID_IXCLRDataExceptionState: GUID = GUID::from_u128(0x75da9e4c_bd33_43c8_8f5c_96e8a5241f57);
+
+/// IID for IXCLRDataExceptionNotification interface
+pub const IID_IXCLRDataExceptionNotification: GUID = GUID::from_u128(0x2d95a079_42a1_4837_818f_0b97d7048e0e);
+
+/// IID for IXCLRDataTypeInstance interface
+pub const IID_IXCLRDataTypeInstance: GUID = GUID::from_u128(0x4d078d91_b8ff_4d18_aeee_f24c881f7384);
