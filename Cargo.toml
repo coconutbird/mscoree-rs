@@ -1,0 +1,24 @@
+[package]
+name = "mscoree"
+version = "0.1.0"
+edition = "2024"
+authors = ["Jon-Luke Biddle"]
+description = "Rust bindings for mscoree COM interfaces for interacting with CLR and COR runtimes"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/coconutbird/mscoree-rs"
+keywords = ["clr", "dotnet", "com", "mscoree", "windows"]
+categories = ["os::windows-apis", "external-ffi-bindings"]
+
+[dependencies]
+# windows-core is required because the #[interface] macro references it internally
+windows-core = "0.61"
+windows = { version = "0.61", features = [
+    "Win32_Foundation",
+    "Win32_System_Com",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Variant",
+] }
+
+[dev-dependencies]
+anyhow = "1.0"
+
