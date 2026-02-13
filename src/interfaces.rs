@@ -1,6 +1,10 @@
 //! COM interface definitions for CLR hosting and debugging.
 
+mod clr_control;
 mod clr_data;
+mod clr_debugging;
+mod clr_strong_name;
+mod clr_task;
 mod cor_debug;
 mod cor_debug_appdomain;
 mod cor_debug_callback;
@@ -36,7 +40,11 @@ mod xclr_data_type;
 mod xclr_data_types;
 mod xclr_data_value;
 
+pub use clr_control::*;
 pub use clr_data::*;
+pub use clr_debugging::*;
+pub use clr_strong_name::*;
+pub use clr_task::*;
 pub use cor_debug::*;
 pub use cor_debug_appdomain::*;
 pub use cor_debug_callback::*;
