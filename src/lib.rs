@@ -21,16 +21,17 @@
 //! ## Example
 //!
 //! ```no_run
-//! use mscoree::{CLRCreateInstance, CLSID_CLRMetaHost, ICLRMetaHost};
-//! use windows::core::PCWSTR;
+//! use mscoree::{CLRCreateInstance, CLSID_CLRMetaHost, ICLRMetaHost, IID_ICLRRuntimeInfo};
+//! use std::ptr::null_mut;
 //!
 //! unsafe {
 //!     // Get the meta host
 //!     let meta_host: ICLRMetaHost = CLRCreateInstance(&CLSID_CLRMetaHost)?;
-//!     
+//!
 //!     // Get runtime info for .NET 4.0
 //!     let version = windows::core::w!("v4.0.30319");
-//!     let runtime_info = meta_host.GetRuntime(version)?;
+//!     let mut runtime_info = null_mut();
+//!     meta_host.GetRuntime(version, &IID_ICLRRuntimeInfo, &mut runtime_info);
 //! }
 //! # Ok::<(), windows::core::Error>(())
 //! ```

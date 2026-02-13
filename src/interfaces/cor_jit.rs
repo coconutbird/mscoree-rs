@@ -182,46 +182,32 @@ pub struct ICorJitCompilerVtbl {
 
     /// ProcessShutdownWork - Called at process shutdown
     #[cfg(target_arch = "x86")]
-    pub ProcessShutdownWork: unsafe extern "thiscall" fn(
-        this: *mut ICorJitCompiler,
-        info: *mut ICorStaticInfo,
-    ),
+    pub ProcessShutdownWork:
+        unsafe extern "thiscall" fn(this: *mut ICorJitCompiler, info: *mut ICorStaticInfo),
 
     #[cfg(not(target_arch = "x86"))]
-    pub ProcessShutdownWork: unsafe extern "C" fn(
-        this: *mut ICorJitCompiler,
-        info: *mut ICorStaticInfo,
-    ),
+    pub ProcessShutdownWork:
+        unsafe extern "C" fn(this: *mut ICorJitCompiler, info: *mut ICorStaticInfo),
 
     /// getVersionIdentifier - Get the JIT/EE interface version
     ///
     /// The EE uses this to verify compatibility with the JIT.
     #[cfg(target_arch = "x86")]
-    pub getVersionIdentifier: unsafe extern "thiscall" fn(
-        this: *mut ICorJitCompiler,
-        versionIdentifier: *mut GUID,
-    ),
+    pub getVersionIdentifier:
+        unsafe extern "thiscall" fn(this: *mut ICorJitCompiler, versionIdentifier: *mut GUID),
 
     #[cfg(not(target_arch = "x86"))]
-    pub getVersionIdentifier: unsafe extern "C" fn(
-        this: *mut ICorJitCompiler,
-        versionIdentifier: *mut GUID,
-    ),
+    pub getVersionIdentifier:
+        unsafe extern "C" fn(this: *mut ICorJitCompiler, versionIdentifier: *mut GUID),
 
     /// setTargetOS - Set the target OS for compilation
     ///
     /// Must be called before compileMethod is called for the first time.
     #[cfg(target_arch = "x86")]
-    pub setTargetOS: unsafe extern "thiscall" fn(
-        this: *mut ICorJitCompiler,
-        os: CORINFO_OS,
-    ),
+    pub setTargetOS: unsafe extern "thiscall" fn(this: *mut ICorJitCompiler, os: CORINFO_OS),
 
     #[cfg(not(target_arch = "x86"))]
-    pub setTargetOS: unsafe extern "C" fn(
-        this: *mut ICorJitCompiler,
-        os: CORINFO_OS,
-    ),
+    pub setTargetOS: unsafe extern "C" fn(this: *mut ICorJitCompiler, os: CORINFO_OS),
 }
 
 /// ICorJitCompiler - The main JIT compiler interface
@@ -237,15 +223,14 @@ pub struct ICorJitCompilerVtbl {
 /// # Example
 ///
 /// ```no_run
-/// use mscoree::interfaces::cor_jit::{ICorJitCompiler, getJit};
+/// use mscoree::{ICorJitCompiler, get_jit_compiler};
 ///
 /// unsafe {
 ///     // Get the JIT compiler
-///     let jit = getJit();
-///     if !jit.is_null() {
+///     if let Some(jit) = get_jit_compiler() {
 ///         // Get version identifier
 ///         let mut version = std::mem::zeroed();
-///         (*(*jit).vtbl).getVersionIdentifier(jit, &mut version);
+///         (*jit).getVersionIdentifier(&mut version);
 ///     }
 /// }
 /// ```
@@ -282,9 +267,7 @@ impl ICorJitCompiler {
     /// Must only be called during process shutdown.
     #[inline]
     pub unsafe fn ProcessShutdownWork(&mut self, info: *mut ICorStaticInfo) {
-        unsafe {
-            ((*self.vtbl).ProcessShutdownWork)(self, info)
-        }
+        unsafe { ((*self.vtbl).ProcessShutdownWork)(self, info) }
     }
 
     /// Get the JIT/EE interface version identifier.
@@ -294,9 +277,7 @@ impl ICorJitCompiler {
     /// The versionIdentifier pointer must be valid.
     #[inline]
     pub unsafe fn getVersionIdentifier(&mut self, versionIdentifier: *mut GUID) {
-        unsafe {
-            ((*self.vtbl).getVersionIdentifier)(self, versionIdentifier)
-        }
+        unsafe { ((*self.vtbl).getVersionIdentifier)(self, versionIdentifier) }
     }
 
     /// Set the target OS for compilation.
@@ -308,9 +289,7 @@ impl ICorJitCompiler {
     /// This must be called exactly once before any compilation.
     #[inline]
     pub unsafe fn setTargetOS(&mut self, os: CORINFO_OS) {
-        unsafe {
-            ((*self.vtbl).setTargetOS)(self, os)
-        }
+        unsafe { ((*self.vtbl).setTargetOS)(self, os) }
     }
 }
 
@@ -407,11 +386,6 @@ unsafe fn get_jit_from_dll(dll_name: windows::core::PCWSTR) -> Option<*mut ICorJ
         let get_jit_fn: extern "C" fn() -> *mut ICorJitCompiler = std::mem::transmute(proc);
         let jit = get_jit_fn();
 
-        if jit.is_null() {
-            None
-        } else {
-            Some(jit)
-        }
+        if jit.is_null() { None } else { Some(jit) }
     }
 }
-
