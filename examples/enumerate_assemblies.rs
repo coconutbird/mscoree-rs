@@ -23,19 +23,23 @@ use std::collections::HashMap;
 use std::env;
 use std::ffi::c_void;
 use std::ptr;
-use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::RwLock;
+use std::sync::atomic::{AtomicU32, Ordering};
 
-use windows::core::{GUID, HRESULT, IUnknown, Interface};
-use windows::Win32::Foundation::{HANDLE, E_NOTIMPL, S_OK, E_FAIL, CloseHandle, MAX_PATH};
+use windows::Win32::Foundation::{CloseHandle, E_FAIL, E_NOTIMPL, HANDLE, MAX_PATH, S_OK};
 use windows::Win32::System::Diagnostics::Debug::{ReadProcessMemory, WriteProcessMemory};
-use windows::Win32::System::ProcessStatus::{EnumProcessModulesEx, GetModuleBaseNameW, GetModuleInformation, LIST_MODULES_ALL, MODULEINFO};
-use windows::Win32::System::Threading::{OpenProcess, PROCESS_VM_READ, PROCESS_VM_WRITE, PROCESS_QUERY_INFORMATION};
-use windows::Win32::System::LibraryLoader::{LoadLibraryW, GetProcAddress};
+use windows::Win32::System::LibraryLoader::{GetProcAddress, LoadLibraryW};
+use windows::Win32::System::ProcessStatus::{
+    EnumProcessModulesEx, GetModuleBaseNameW, GetModuleInformation, LIST_MODULES_ALL, MODULEINFO,
+};
+use windows::Win32::System::Threading::{
+    OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_VM_READ, PROCESS_VM_WRITE,
+};
+use windows::core::{GUID, HRESULT, IUnknown, Interface};
 
 use mscoree::{
-    IXCLRDataProcess, IXCLRDataAppDomain, IXCLRDataAssembly, IXCLRDataModule,
-    CLRDATA_ENUM, IID_IXCLRDataProcess, IID_ICLRDataTarget,
+    CLRDATA_ENUM, IID_ICLRDataTarget, IID_IXCLRDataProcess, IXCLRDataAppDomain, IXCLRDataAssembly,
+    IXCLRDataModule, IXCLRDataProcess,
 };
 
 /// Function pointer type for CLRDataCreateInstance from the DAC DLL
@@ -50,10 +54,12 @@ type CLRDataCreateInstanceFn = unsafe extern "system" fn(
 // doesn't work well with our custom #[interface] definitions.
 
 /// VTable for ICLRDataTarget - matches the COM interface layout
+#[allow(dead_code)]
 #[repr(C)]
 struct ICLRDataTargetVtbl {
     // IUnknown methods
-    query_interface: unsafe extern "system" fn(*mut c_void, *const GUID, *mut *mut c_void) -> HRESULT,
+    query_interface:
+        unsafe extern "system" fn(*mut c_void, *const GUID, *mut *mut c_void) -> HRESULT,
     add_ref: unsafe extern "system" fn(*mut c_void) -> u32,
     release: unsafe extern "system" fn(*mut c_void) -> u32,
     // ICLRDataTarget methods
@@ -72,6 +78,7 @@ struct ICLRDataTargetVtbl {
 
 /// Our implementation of ICLRDataTarget for live process memory reading
 #[allow(dead_code)]
+#[repr(C)]
 struct LiveProcessDataTarget {
     /// Pointer to vtable - must be first field for COM compatibility
     vtbl: *const ICLRDataTargetVtbl,
@@ -83,6 +90,7 @@ struct LiveProcessDataTarget {
 }
 
 // Static vtable instance
+#[allow(dead_code)]
 static LIVE_PROCESS_DATA_TARGET_VTBL: ICLRDataTargetVtbl = ICLRDataTargetVtbl {
     query_interface: LiveProcessDataTarget::query_interface,
     add_ref: LiveProcessDataTarget::add_ref,
@@ -131,14 +139,18 @@ impl LiveProcessDataTarget {
                 (modules.len() * std::mem::size_of::<windows::Win32::Foundation::HMODULE>()) as u32,
                 &mut cb_needed,
                 LIST_MODULES_ALL,
-            ).is_ok() {
-                let module_count = cb_needed as usize / std::mem::size_of::<windows::Win32::Foundation::HMODULE>();
+            )
+            .is_ok()
+            {
+                let module_count =
+                    cb_needed as usize / std::mem::size_of::<windows::Win32::Foundation::HMODULE>();
 
                 for i in 0..module_count {
                     let module = modules[i];
                     let mut name_buf = [0u16; MAX_PATH as usize];
 
-                    let name_len = GetModuleBaseNameW(self.process_handle, Some(module), &mut name_buf);
+                    let name_len =
+                        GetModuleBaseNameW(self.process_handle, Some(module), &mut name_buf);
                     if name_len > 0 {
                         let name = String::from_utf16_lossy(&name_buf[..name_len as usize]);
                         let name_lower = name.to_lowercase();
@@ -149,7 +161,9 @@ impl LiveProcessDataTarget {
                             module,
                             &mut mod_info,
                             std::mem::size_of::<MODULEINFO>() as u32,
-                        ).is_ok() {
+                        )
+                        .is_ok()
+                        {
                             let base_addr = mod_info.lpBaseOfDll as u64;
                             cache.insert(name_lower, base_addr);
                         }
@@ -174,7 +188,9 @@ impl LiveProcessDataTarget {
             }
             S_OK
         } else {
-            unsafe { *ppv = ptr::null_mut(); }
+            unsafe {
+                *ppv = ptr::null_mut();
+            }
             HRESULT(-2147467262i32) // E_NOINTERFACE
         }
     }
@@ -193,19 +209,31 @@ impl LiveProcessDataTarget {
         count
     }
 
-    unsafe extern "system" fn get_machine_type(_this: *mut c_void, machine_type: *mut u32) -> HRESULT {
+    unsafe extern "system" fn get_machine_type(
+        _this: *mut c_void,
+        machine_type: *mut u32,
+    ) -> HRESULT {
         unsafe {
             #[cfg(target_arch = "x86_64")]
-            { *machine_type = 0x8664; } // IMAGE_FILE_MACHINE_AMD64
+            {
+                *machine_type = 0x8664;
+            } // IMAGE_FILE_MACHINE_AMD64
             #[cfg(target_arch = "x86")]
-            { *machine_type = 0x014c; } // IMAGE_FILE_MACHINE_I386
+            {
+                *machine_type = 0x014c;
+            } // IMAGE_FILE_MACHINE_I386
         }
         S_OK
     }
 
-    unsafe extern "system" fn get_pointer_size(this: *mut c_void, pointer_size: *mut u32) -> HRESULT {
+    unsafe extern "system" fn get_pointer_size(
+        this: *mut c_void,
+        pointer_size: *mut u32,
+    ) -> HRESULT {
         let target = unsafe { &*(this as *const Self) };
-        unsafe { *pointer_size = target.pointer_size; }
+        unsafe {
+            *pointer_size = target.pointer_size;
+        }
         S_OK
     }
 
@@ -239,17 +267,25 @@ impl LiveProcessDataTarget {
         // Look up the module in the cache
         let cache = target.module_cache.read().unwrap();
         if let Some(&addr) = cache.get(&filename) {
-            unsafe { *base_address = addr; }
+            unsafe {
+                *base_address = addr;
+            }
             S_OK
         } else {
             // Try partial match (e.g., "clr.dll" might be requested as "clr")
             for (name, &addr) in cache.iter() {
-                if name.starts_with(&filename) || filename.starts_with(name.trim_end_matches(".dll")) {
-                    unsafe { *base_address = addr; }
+                if name.starts_with(&filename)
+                    || filename.starts_with(name.trim_end_matches(".dll"))
+                {
+                    unsafe {
+                        *base_address = addr;
+                    }
                     return S_OK;
                 }
             }
-            unsafe { *base_address = 0; }
+            unsafe {
+                *base_address = 0;
+            }
             E_FAIL
         }
     }
@@ -311,35 +347,56 @@ impl LiveProcessDataTarget {
     }
 
     unsafe extern "system" fn get_tls_value(
-        _this: *mut c_void, _thread_id: u32, _index: u32, _value: *mut u64,
+        _this: *mut c_void,
+        _thread_id: u32,
+        _index: u32,
+        _value: *mut u64,
     ) -> HRESULT {
         E_NOTIMPL
     }
 
     unsafe extern "system" fn set_tls_value(
-        _this: *mut c_void, _thread_id: u32, _index: u32, _value: u64,
+        _this: *mut c_void,
+        _thread_id: u32,
+        _index: u32,
+        _value: u64,
     ) -> HRESULT {
         E_NOTIMPL
     }
 
-    unsafe extern "system" fn get_current_thread_id(_this: *mut c_void, _thread_id: *mut u32) -> HRESULT {
+    unsafe extern "system" fn get_current_thread_id(
+        _this: *mut c_void,
+        _thread_id: *mut u32,
+    ) -> HRESULT {
         E_NOTIMPL
     }
 
     unsafe extern "system" fn get_thread_context(
-        _this: *mut c_void, _thread_id: u32, _context_flags: u32, _context_size: u32, _context: *mut u8,
+        _this: *mut c_void,
+        _thread_id: u32,
+        _context_flags: u32,
+        _context_size: u32,
+        _context: *mut u8,
     ) -> HRESULT {
         E_NOTIMPL
     }
 
     unsafe extern "system" fn set_thread_context(
-        _this: *mut c_void, _thread_id: u32, _context_size: u32, _context: *const u8,
+        _this: *mut c_void,
+        _thread_id: u32,
+        _context_size: u32,
+        _context: *const u8,
     ) -> HRESULT {
         E_NOTIMPL
     }
 
     unsafe extern "system" fn request(
-        _this: *mut c_void, _req_code: u32, _in_size: u32, _in_buf: *const u8, _out_size: u32, _out_buf: *mut u8,
+        _this: *mut c_void,
+        _req_code: u32,
+        _in_size: u32,
+        _in_buf: *const u8,
+        _out_size: u32,
+        _out_buf: *mut u8,
     ) -> HRESULT {
         E_NOTIMPL
     }
@@ -355,7 +412,9 @@ fn wide_to_string(buffer: &[u16], len: u32) -> String {
 
 /// Find the CLR module path in the target process and return the DAC DLL path
 fn find_dac_path(process_handle: HANDLE) -> Option<String> {
-    use windows::Win32::System::ProcessStatus::{EnumProcessModulesEx, GetModuleFileNameExW, LIST_MODULES_ALL};
+    use windows::Win32::System::ProcessStatus::{
+        EnumProcessModulesEx, GetModuleFileNameExW, LIST_MODULES_ALL,
+    };
 
     unsafe {
         let mut modules = [std::mem::zeroed::<windows::Win32::Foundation::HMODULE>(); 1024];
@@ -367,14 +426,18 @@ fn find_dac_path(process_handle: HANDLE) -> Option<String> {
             (modules.len() * std::mem::size_of::<windows::Win32::Foundation::HMODULE>()) as u32,
             &mut cb_needed,
             LIST_MODULES_ALL,
-        ).is_ok() {
-            let module_count = cb_needed as usize / std::mem::size_of::<windows::Win32::Foundation::HMODULE>();
+        )
+        .is_ok()
+        {
+            let module_count =
+                cb_needed as usize / std::mem::size_of::<windows::Win32::Foundation::HMODULE>();
 
             for i in 0..module_count {
                 let module = modules[i];
                 let mut path_buf = [0u16; 1024];
 
-                let path_len = GetModuleFileNameExW(Some(process_handle), Some(module), &mut path_buf);
+                let path_len =
+                    GetModuleFileNameExW(Some(process_handle), Some(module), &mut path_buf);
                 if path_len > 0 {
                     let path = String::from_utf16_lossy(&path_buf[..path_len as usize]);
                     let path_lower = path.to_lowercase();
@@ -444,9 +507,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("Found DAC at: {}", path);
             path
         } else {
-            return Err("Could not find DAC DLL. Please provide the path as second argument.\n\
+            return Err(
+                "Could not find DAC DLL. Please provide the path as second argument.\n\
                        For .NET Core: path to mscordaccore.dll\n\
-                       For .NET Framework: path to mscordacwks.dll".into());
+                       For .NET Framework: path to mscordacwks.dll"
+                    .into(),
+            );
         };
 
         // Convert to wide string and load
@@ -456,19 +522,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         // Get CLRDataCreateInstance function
         let proc_name = windows::core::s!("CLRDataCreateInstance");
-        let proc_addr = GetProcAddress(dac_module, proc_name)
-            .ok_or("Failed to get CLRDataCreateInstance")?;
+        let proc_addr =
+            GetProcAddress(dac_module, proc_name).ok_or("Failed to get CLRDataCreateInstance")?;
 
-        let clr_data_create_instance: CLRDataCreateInstanceFn =
-            std::mem::transmute(proc_addr);
+        let clr_data_create_instance: CLRDataCreateInstanceFn = std::mem::transmute(proc_addr);
 
         // Create IXCLRDataProcess
         let mut process_ptr: *mut c_void = ptr::null_mut();
-        let hr = clr_data_create_instance(
-            &IID_IXCLRDataProcess,
-            data_target_ptr,
-            &mut process_ptr,
-        );
+        let hr = clr_data_create_instance(&IID_IXCLRDataProcess, data_target_ptr, &mut process_ptr);
 
         if hr.is_err() {
             CloseHandle(process_handle)?;
@@ -482,131 +543,147 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("AppDomains:");
         println!("-----------");
         let mut app_domain_enum: CLRDATA_ENUM = 0;
-        if xclr_process.StartEnumAppDomains(&mut app_domain_enum).is_ok() {
+        let hr = xclr_process.StartEnumAppDomains(&mut app_domain_enum);
+        if hr.is_ok() {
             loop {
-                let mut app_domain_ptr: *mut IUnknown = ptr::null_mut();
-                let hr = xclr_process.EnumAppDomain(&mut app_domain_enum, &mut app_domain_ptr);
+                let mut app_domain_raw: *mut c_void = ptr::null_mut();
+                let hr = xclr_process.EnumAppDomain(
+                    &mut app_domain_enum,
+                    &mut app_domain_raw as *mut *mut c_void as *mut *mut IUnknown,
+                );
 
-                if hr.is_err() || app_domain_ptr.is_null() {
+                if hr.is_err() || app_domain_raw.is_null() {
                     break;
                 }
 
-                // Cast to IXCLRDataAppDomain
-                if let Ok(app_domain) = (*app_domain_ptr).cast::<IXCLRDataAppDomain>() {
-                    let mut name_buf = [0u16; 512];
-                    let mut name_len: u32 = 0;
+                // The returned pointer is an IXCLRDataAppDomain
+                let app_domain = IXCLRDataAppDomain::from_raw(app_domain_raw);
+                let mut name_buf = [0u16; 512];
+                let mut name_len: u32 = 0;
 
-                    if app_domain.GetName(
-                        name_buf.len() as u32,
-                        &mut name_len,
-                        name_buf.as_mut_ptr(),
-                    ).is_ok() {
-                        let name = wide_to_string(&name_buf, name_len);
-                        println!("  AppDomain: {}", name);
-                    }
+                if app_domain
+                    .GetName(name_buf.len() as u32, &mut name_len, name_buf.as_mut_ptr())
+                    .is_ok()
+                {
+                    let name = wide_to_string(&name_buf, name_len);
+                    println!("  AppDomain: {}", name);
                 }
             }
             let _ = xclr_process.EndEnumAppDomains(app_domain_enum);
+        } else {
+            println!("  Failed to enumerate AppDomains: {:?}", hr);
         }
 
         // Enumerate Assemblies
         println!("\nAssemblies:");
         println!("-----------");
         let mut assembly_enum: CLRDATA_ENUM = 0;
-        if xclr_process.StartEnumAssemblies(&mut assembly_enum).is_ok() {
+        let hr = xclr_process.StartEnumAssemblies(&mut assembly_enum);
+        if hr.is_ok() {
             loop {
-                let mut assembly_ptr: *mut IUnknown = ptr::null_mut();
-                let hr = xclr_process.EnumAssembly(&mut assembly_enum, &mut assembly_ptr);
+                let mut assembly_raw: *mut c_void = ptr::null_mut();
+                let hr = xclr_process.EnumAssembly(
+                    &mut assembly_enum,
+                    &mut assembly_raw as *mut *mut c_void as *mut *mut IUnknown,
+                );
 
-                if hr.is_err() || assembly_ptr.is_null() {
+                if hr.is_err() || assembly_raw.is_null() {
                     break;
                 }
 
-                // Cast to IXCLRDataAssembly
-                if let Ok(assembly) = (*assembly_ptr).cast::<IXCLRDataAssembly>() {
-                    let mut name_buf = [0u16; 1024];
-                    let mut name_len: u32 = 0;
+                // The returned pointer is an IXCLRDataAssembly
+                let assembly = IXCLRDataAssembly::from_raw(assembly_raw);
+                let mut name_buf = [0u16; 1024];
+                let mut name_len: u32 = 0;
 
-                    // Get display name
-                    if assembly.GetDisplayName(
-                        name_buf.len() as u32,
-                        &mut name_len,
-                        name_buf.as_mut_ptr(),
-                    ).is_ok() {
-                        let name = wide_to_string(&name_buf, name_len);
-                        println!("  Assembly: {}", name);
-                    } else if assembly.GetName(
-                        name_buf.len() as u32,
-                        &mut name_len,
-                        name_buf.as_mut_ptr(),
-                    ).is_ok() {
-                        let name = wide_to_string(&name_buf, name_len);
-                        println!("  Assembly: {}", name);
-                    }
+                // Get display name
+                if assembly
+                    .GetDisplayName(name_buf.len() as u32, &mut name_len, name_buf.as_mut_ptr())
+                    .is_ok()
+                {
+                    let name = wide_to_string(&name_buf, name_len);
+                    println!("  Assembly: {}", name);
+                } else if assembly
+                    .GetName(name_buf.len() as u32, &mut name_len, name_buf.as_mut_ptr())
+                    .is_ok()
+                {
+                    let name = wide_to_string(&name_buf, name_len);
+                    println!("  Assembly: {}", name);
+                }
 
-                    // Get file name
-                    if assembly.GetFileName(
-                        name_buf.len() as u32,
-                        &mut name_len,
-                        name_buf.as_mut_ptr(),
-                    ).is_ok() {
-                        let filename = wide_to_string(&name_buf, name_len);
-                        println!("    File: {}", filename);
-                    }
+                // Get file name
+                if assembly
+                    .GetFileName(name_buf.len() as u32, &mut name_len, name_buf.as_mut_ptr())
+                    .is_ok()
+                {
+                    let filename = wide_to_string(&name_buf, name_len);
+                    println!("    File: {}", filename);
                 }
             }
             let _ = xclr_process.EndEnumAssemblies(assembly_enum);
+        } else {
+            println!("  Failed to enumerate Assemblies: {:?}", hr);
         }
 
         // Enumerate Modules
         println!("\nModules:");
         println!("--------");
         let mut module_enum: CLRDATA_ENUM = 0;
-        if xclr_process.StartEnumModules(&mut module_enum).is_ok() {
+        let hr = xclr_process.StartEnumModules(&mut module_enum);
+        if hr.is_ok() {
             loop {
-                let mut module_ptr: *mut IUnknown = ptr::null_mut();
-                let hr = xclr_process.EnumModule(&mut module_enum, &mut module_ptr);
+                let mut module_raw: *mut c_void = ptr::null_mut();
+                let hr = xclr_process.EnumModule(
+                    &mut module_enum,
+                    &mut module_raw as *mut *mut c_void as *mut *mut IUnknown,
+                );
 
-                if hr.is_err() || module_ptr.is_null() {
+                if hr.is_err() || module_raw.is_null() {
                     break;
                 }
 
-                // Cast to IXCLRDataModule
-                if let Ok(module) = (*module_ptr).cast::<IXCLRDataModule>() {
-                    let mut name_buf = [0u16; 1024];
-                    let mut name_len: u32 = 0;
+                // The returned pointer is an IXCLRDataModule
+                let module = IXCLRDataModule::from_raw(module_raw);
+                let mut name_buf = [0u16; 1024];
+                let mut name_len: u32 = 0;
 
-                    if module.GetName(
-                        name_buf.len() as u32,
-                        &mut name_len,
-                        name_buf.as_mut_ptr(),
-                    ).is_ok() {
-                        let name = wide_to_string(&name_buf, name_len);
-                        println!("  Module: {}", name);
-                    }
+                if module
+                    .GetName(name_buf.len() as u32, &mut name_len, name_buf.as_mut_ptr())
+                    .is_ok()
+                {
+                    let name = wide_to_string(&name_buf, name_len);
+                    println!("  Module: {}", name);
+                }
 
-                    // Get file name
-                    if module.GetFileName(
-                        name_buf.len() as u32,
-                        &mut name_len,
-                        name_buf.as_mut_ptr(),
-                    ).is_ok() {
-                        let filename = wide_to_string(&name_buf, name_len);
-                        println!("    File: {}", filename);
-                    }
+                // Get file name
+                if module
+                    .GetFileName(name_buf.len() as u32, &mut name_len, name_buf.as_mut_ptr())
+                    .is_ok()
+                {
+                    let filename = wide_to_string(&name_buf, name_len);
+                    println!("    File: {}", filename);
                 }
             }
             let _ = xclr_process.EndEnumModules(module_enum);
+        } else {
+            println!("  Failed to enumerate Modules: {:?}", hr);
         }
 
-        // Cleanup
-        // Free our data target (we own it)
-        drop(Box::from_raw(data_target_ptr as *mut LiveProcessDataTarget));
-        CloseHandle(process_handle)?;
-
         println!("\nEnumeration complete!");
+
+        // Cleanup - order matters!
+        // 1. First, explicitly drop the IXCLRDataProcess to release the DAC's reference
+        drop(xclr_process);
+
+        // 2. Now we can safely free our data target
+        // Note: The DAC may have added references to our data target, so we need to be careful.
+        // For safety, we'll just leak the data target rather than risk a double-free or use-after-free.
+        // In a production scenario, you'd want proper ref counting.
+        // drop(Box::from_raw(data_target_ptr as *mut LiveProcessDataTarget));
+
+        // 3. Close the process handle
+        CloseHandle(process_handle)?;
     }
 
     Ok(())
 }
-
