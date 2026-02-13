@@ -9,18 +9,10 @@ use windows::core::{HRESULT, IUnknown, IUnknown_Vtbl, interface};
 #[interface("7CA04601-C702-4670-A63C-FA44F7DA7BD5")]
 pub unsafe trait IXCLRDataAppDomain: IUnknown {
     /// Get the owning process.
-    pub unsafe fn GetProcess(
-        &self,
-        process: *mut *mut IUnknown,
-    ) -> HRESULT;
+    pub unsafe fn GetProcess(&self, process: *mut *mut IUnknown) -> HRESULT;
 
     /// Get the name of this app domain.
-    pub unsafe fn GetName(
-        &self,
-        bufLen: u32,
-        nameLen: *mut u32,
-        name: *mut u16,
-    ) -> HRESULT;
+    pub unsafe fn GetName(&self, bufLen: u32, nameLen: *mut u32, name: *mut u16) -> HRESULT;
 
     /// Get the unique identifier for this app domain.
     pub unsafe fn GetUniqueID(&self, id: *mut u64) -> HRESULT;
@@ -34,4 +26,3 @@ pub unsafe trait IXCLRDataAppDomain: IUnknown {
     /// Get the managed object representing this app domain.
     pub unsafe fn GetManagedObject(&self, value: *mut *mut IUnknown) -> HRESULT;
 }
-

@@ -96,12 +96,7 @@ pub unsafe trait ICLRDataTarget: IUnknown {
     /// * `threadID` - Operating system identifier of the thread
     /// * `index` - TLS index
     /// * `value` - The TLS value to set
-    pub unsafe fn SetTLSValue(
-        &self,
-        threadID: u32,
-        index: u32,
-        value: CLRDATA_ADDRESS,
-    ) -> HRESULT;
+    pub unsafe fn SetTLSValue(&self, threadID: u32, index: u32, value: CLRDATA_ADDRESS) -> HRESULT;
 
     /// Gets the operating system identifier for the current thread.
     ///
@@ -190,12 +185,7 @@ pub unsafe trait ICLRDataTarget2: ICLRDataTarget {
     /// * `addr` - Starting address of the region to free
     /// * `size` - Size of the region to free
     /// * `typeFlags` - Memory free type flags (MEM_DECOMMIT, MEM_RELEASE)
-    pub unsafe fn FreeVirtual(
-        &self,
-        addr: CLRDATA_ADDRESS,
-        size: u32,
-        typeFlags: u32,
-    ) -> HRESULT;
+    pub unsafe fn FreeVirtual(&self, addr: CLRDATA_ADDRESS, size: u32, typeFlags: u32) -> HRESULT;
 }
 
 /// ICLRDataTarget3 interface for CLR debugging (.NET 4.5.1+).
@@ -238,4 +228,3 @@ pub unsafe trait ICLRDataTarget3: ICLRDataTarget2 {
     /// * `threadID` - Receives the thread ID
     pub unsafe fn GetExceptionThreadID(&self, threadID: *mut u32) -> HRESULT;
 }
-

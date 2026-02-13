@@ -14,16 +14,10 @@ pub unsafe trait IXCLRDataExceptionState: IUnknown {
     pub unsafe fn GetFlags(&self, flags: *mut u32) -> HRESULT;
 
     /// Get the previous exception in the chain.
-    pub unsafe fn GetPrevious(
-        &self,
-        exState: *mut *mut IXCLRDataExceptionState,
-    ) -> HRESULT;
+    pub unsafe fn GetPrevious(&self, exState: *mut *mut IXCLRDataExceptionState) -> HRESULT;
 
     /// Get the managed exception object.
-    pub unsafe fn GetManagedObject(
-        &self,
-        value: *mut *mut IUnknown,
-    ) -> HRESULT;
+    pub unsafe fn GetManagedObject(&self, value: *mut *mut IUnknown) -> HRESULT;
 
     /// Get the base type of the exception.
     pub unsafe fn GetBaseType(&self, r#type: *mut u32) -> HRESULT;
@@ -32,12 +26,7 @@ pub unsafe trait IXCLRDataExceptionState: IUnknown {
     pub unsafe fn GetCode(&self, code: *mut u32) -> HRESULT;
 
     /// Get the exception string.
-    pub unsafe fn GetString(
-        &self,
-        bufLen: u32,
-        strLen: *mut u32,
-        str: *mut u16,
-    ) -> HRESULT;
+    pub unsafe fn GetString(&self, bufLen: u32, strLen: *mut u32, str: *mut u16) -> HRESULT;
 
     /// Generic request operation.
     pub unsafe fn Request(
@@ -50,23 +39,13 @@ pub unsafe trait IXCLRDataExceptionState: IUnknown {
     ) -> HRESULT;
 
     /// Determine whether this is the same state as another.
-    pub unsafe fn IsSameState(
-        &self,
-        exState: *mut IXCLRDataExceptionState,
-    ) -> HRESULT;
+    pub unsafe fn IsSameState(&self, exState: *mut IXCLRDataExceptionState) -> HRESULT;
 
     /// Determine whether this is the same state using record pointer.
-    pub unsafe fn IsSameState2(
-        &self,
-        flags: u32,
-        exRecord: *const u8,
-    ) -> HRESULT;
+    pub unsafe fn IsSameState2(&self, flags: u32, exRecord: *const u8) -> HRESULT;
 
     /// Get the task for this exception.
-    pub unsafe fn GetTask(
-        &self,
-        task: *mut *mut IUnknown,
-    ) -> HRESULT;
+    pub unsafe fn GetTask(&self, task: *mut *mut IUnknown) -> HRESULT;
 }
 
 /// IXCLRDataExceptionNotification - Exception notification callback.
@@ -132,4 +111,3 @@ pub unsafe trait IXCLRDataExceptionNotification5: IXCLRDataExceptionNotification
         nativeCodeLocation: CLRDATA_ADDRESS,
     ) -> HRESULT;
 }
-

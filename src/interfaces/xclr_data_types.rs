@@ -234,4 +234,3 @@ pub struct GcEvtArgs {
     pub typ: GcEvt_t,
     pub condemnedGeneration: i32,
 }
-

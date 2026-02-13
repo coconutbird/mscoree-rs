@@ -5,7 +5,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-use windows::core::{HRESULT, IUnknown, IUnknown_Vtbl, interface, GUID, PCWSTR};
+use windows::core::{GUID, HRESULT, IUnknown, IUnknown_Vtbl, PCWSTR, interface};
 
 use super::data_target::CLRDATA_ADDRESS;
 
@@ -22,16 +22,14 @@ pub mod CLRDataEnumMemoryFlags {
 #[interface("BCDD6908-BA2D-4ec5-96CF-DF4D5CDCB4A4")]
 pub unsafe trait ICLRDataEnumMemoryRegionsCallback: IUnknown {
     /// Called for every memory region enumerated.
-    pub unsafe fn EnumMemoryRegion(
-        &self,
-        address: CLRDATA_ADDRESS,
-        size: u32,
-    ) -> HRESULT;
+    pub unsafe fn EnumMemoryRegion(&self, address: CLRDATA_ADDRESS, size: u32) -> HRESULT;
 }
 
 /// ICLRDataEnumMemoryRegionsCallback2 - Extended callback with memory update.
 #[interface("3721A26F-8B91-4D98-A388-DB17B356FADB")]
-pub unsafe trait ICLRDataEnumMemoryRegionsCallback2: ICLRDataEnumMemoryRegionsCallback {
+pub unsafe trait ICLRDataEnumMemoryRegionsCallback2:
+    ICLRDataEnumMemoryRegionsCallback
+{
     /// Called to overwrite/poison memory regions with specified data.
     pub unsafe fn UpdateMemoryRegion(
         &self,
@@ -104,4 +102,3 @@ pub unsafe trait IXCLRDataTarget3: IUnknown {
         dataSize: *mut u32,
     ) -> HRESULT;
 }
-

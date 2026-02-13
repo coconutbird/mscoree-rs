@@ -21,26 +21,13 @@ pub unsafe trait IXCLRDataValue: IUnknown {
     pub unsafe fn GetSize(&self, size: *mut u64) -> HRESULT;
 
     /// Read bytes from this value.
-    pub unsafe fn GetBytes(
-        &self,
-        bufLen: u32,
-        dataSize: *mut u32,
-        buffer: *mut u8,
-    ) -> HRESULT;
+    pub unsafe fn GetBytes(&self, bufLen: u32, dataSize: *mut u32, buffer: *mut u8) -> HRESULT;
 
     /// Write bytes to this value.
-    pub unsafe fn SetBytes(
-        &self,
-        bufLen: u32,
-        dataSize: *mut u32,
-        buffer: *const u8,
-    ) -> HRESULT;
+    pub unsafe fn SetBytes(&self, bufLen: u32, dataSize: *mut u32, buffer: *const u8) -> HRESULT;
 
     /// Get the type of this value.
-    pub unsafe fn GetType(
-        &self,
-        typeInstance: *mut *mut IUnknown,
-    ) -> HRESULT;
+    pub unsafe fn GetType(&self, typeInstance: *mut *mut IUnknown) -> HRESULT;
 
     /// Get the number of fields in this value.
     pub unsafe fn GetNumFields(&self, numFields: *mut u32) -> HRESULT;
@@ -120,24 +107,13 @@ pub unsafe trait IXCLRDataValue: IUnknown {
     ) -> HRESULT;
 
     /// Get the associated value (e.g. boxed value).
-    pub unsafe fn GetAssociatedValue(
-        &self,
-        assocValue: *mut *mut IXCLRDataValue,
-    ) -> HRESULT;
+    pub unsafe fn GetAssociatedValue(&self, assocValue: *mut *mut IXCLRDataValue) -> HRESULT;
 
     /// Get the associated type.
-    pub unsafe fn GetAssociatedType(
-        &self,
-        assocType: *mut *mut IUnknown,
-    ) -> HRESULT;
+    pub unsafe fn GetAssociatedType(&self, assocType: *mut *mut IUnknown) -> HRESULT;
 
     /// Get a string value.
-    pub unsafe fn GetString(
-        &self,
-        bufLen: u32,
-        strLen: *mut u32,
-        str: *mut u16,
-    ) -> HRESULT;
+    pub unsafe fn GetString(&self, bufLen: u32, strLen: *mut u32, str: *mut u16) -> HRESULT;
 
     /// Get array properties.
     pub unsafe fn GetArrayProperties(
@@ -169,4 +145,3 @@ pub unsafe trait IXCLRDataValue: IUnknown {
         address: *mut CLRDATA_ADDRESS,
     ) -> HRESULT;
 }
-

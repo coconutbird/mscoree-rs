@@ -11,11 +11,7 @@ use super::xclr_data_process::CLRDATA_ENUM;
 #[interface("AB4D17D4-0016-4c1a-9AAF-DA8BE775FBC4")]
 pub unsafe trait IXCLRDataFrame: IUnknown {
     /// Get the frame type.
-    pub unsafe fn GetFrameType(
-        &self,
-        simpleType: *mut u32,
-        detailedType: *mut u32,
-    ) -> HRESULT;
+    pub unsafe fn GetFrameType(&self, simpleType: *mut u32, detailedType: *mut u32) -> HRESULT;
 
     /// Get the context for this frame.
     pub unsafe fn GetContext(
@@ -27,17 +23,10 @@ pub unsafe trait IXCLRDataFrame: IUnknown {
     ) -> HRESULT;
 
     /// Get the method instance for this frame.
-    pub unsafe fn GetMethodInstance(
-        &self,
-        method: *mut *mut IUnknown,
-    ) -> HRESULT;
+    pub unsafe fn GetMethodInstance(&self, method: *mut *mut IUnknown) -> HRESULT;
 
     /// Begin enumeration of local variables.
-    pub unsafe fn StartEnumLocalVariables(
-        &self,
-        flags: u32,
-        handle: *mut CLRDATA_ENUM,
-    ) -> HRESULT;
+    pub unsafe fn StartEnumLocalVariables(&self, flags: u32, handle: *mut CLRDATA_ENUM) -> HRESULT;
 
     /// Get the next local variable in the enumeration.
     pub unsafe fn EnumLocalVariable(
@@ -60,11 +49,7 @@ pub unsafe trait IXCLRDataFrame: IUnknown {
     ) -> HRESULT;
 
     /// Begin enumeration of arguments.
-    pub unsafe fn StartEnumArguments(
-        &self,
-        flags: u32,
-        handle: *mut CLRDATA_ENUM,
-    ) -> HRESULT;
+    pub unsafe fn StartEnumArguments(&self, flags: u32, handle: *mut CLRDATA_ENUM) -> HRESULT;
 
     /// Get the next argument in the enumeration.
     pub unsafe fn EnumArgument(
@@ -105,11 +90,8 @@ pub unsafe trait IXCLRDataFrame: IUnknown {
     pub unsafe fn GetNumTypeArguments(&self, numTypeArgs: *mut u32) -> HRESULT;
 
     /// Get a type argument by index.
-    pub unsafe fn GetTypeArgumentByIndex(
-        &self,
-        index: u32,
-        typeArg: *mut *mut IUnknown,
-    ) -> HRESULT;
+    pub unsafe fn GetTypeArgumentByIndex(&self, index: u32, typeArg: *mut *mut IUnknown)
+    -> HRESULT;
 
     /// Generic request operation.
     pub unsafe fn Request(
@@ -126,9 +108,5 @@ pub unsafe trait IXCLRDataFrame: IUnknown {
 #[interface("1C4D9A4B-702D-4cf6-B290-1DB6F43050D0")]
 pub unsafe trait IXCLRDataFrame2: IUnknown {
     /// Get the exact generic arguments for this frame.
-    pub unsafe fn GetExactGenericArgsToken(
-        &self,
-        genericToken: *mut *mut IUnknown,
-    ) -> HRESULT;
+    pub unsafe fn GetExactGenericArgsToken(&self, genericToken: *mut *mut IUnknown) -> HRESULT;
 }
-

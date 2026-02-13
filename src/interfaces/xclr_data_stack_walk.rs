@@ -18,11 +18,7 @@ pub unsafe trait IXCLRDataStackWalk: IUnknown {
     ) -> HRESULT;
 
     /// Set the context for the walker.
-    pub unsafe fn SetContext(
-        &self,
-        contextSize: u32,
-        context: *const u8,
-    ) -> HRESULT;
+    pub unsafe fn SetContext(&self, contextSize: u32, context: *const u8) -> HRESULT;
 
     /// Move to the next frame.
     pub unsafe fn Next(&self) -> HRESULT;
@@ -31,17 +27,10 @@ pub unsafe trait IXCLRDataStackWalk: IUnknown {
     pub unsafe fn GetStackSizeSkipped(&self, stackSizeSkipped: *mut u64) -> HRESULT;
 
     /// Get the frame type.
-    pub unsafe fn GetFrameType(
-        &self,
-        simpleType: *mut u32,
-        detailedType: *mut u32,
-    ) -> HRESULT;
+    pub unsafe fn GetFrameType(&self, simpleType: *mut u32, detailedType: *mut u32) -> HRESULT;
 
     /// Get the current frame.
-    pub unsafe fn GetFrame(
-        &self,
-        frame: *mut *mut IUnknown,
-    ) -> HRESULT;
+    pub unsafe fn GetFrame(&self, frame: *mut *mut IUnknown) -> HRESULT;
 
     /// Generic request operation.
     pub unsafe fn Request(
@@ -54,11 +43,5 @@ pub unsafe trait IXCLRDataStackWalk: IUnknown {
     ) -> HRESULT;
 
     /// Set the context with additional control.
-    pub unsafe fn SetContext2(
-        &self,
-        flags: u32,
-        contextSize: u32,
-        context: *const u8,
-    ) -> HRESULT;
+    pub unsafe fn SetContext2(&self, flags: u32, contextSize: u32, context: *const u8) -> HRESULT;
 }
-

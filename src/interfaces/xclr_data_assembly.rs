@@ -24,20 +24,10 @@ pub unsafe trait IXCLRDataAssembly: IUnknown {
     pub unsafe fn EndEnumModules(&self, handle: CLRDATA_ENUM) -> HRESULT;
 
     /// Get the name of this assembly.
-    pub unsafe fn GetName(
-        &self,
-        bufLen: u32,
-        nameLen: *mut u32,
-        name: *mut u16,
-    ) -> HRESULT;
+    pub unsafe fn GetName(&self, bufLen: u32, nameLen: *mut u32, name: *mut u16) -> HRESULT;
 
     /// Get the file name of this assembly.
-    pub unsafe fn GetFileName(
-        &self,
-        bufLen: u32,
-        nameLen: *mut u32,
-        name: *mut u16,
-    ) -> HRESULT;
+    pub unsafe fn GetFileName(&self, bufLen: u32, nameLen: *mut u32, name: *mut u16) -> HRESULT;
 
     /// Get the flags for this assembly.
     pub unsafe fn GetFlags(&self, flags: *mut u32) -> HRESULT;
@@ -69,11 +59,5 @@ pub unsafe trait IXCLRDataAssembly: IUnknown {
     pub unsafe fn EndEnumAppDomains(&self, handle: CLRDATA_ENUM) -> HRESULT;
 
     /// Get the display name of this assembly.
-    pub unsafe fn GetDisplayName(
-        &self,
-        bufLen: u32,
-        nameLen: *mut u32,
-        name: *mut u16,
-    ) -> HRESULT;
+    pub unsafe fn GetDisplayName(&self, bufLen: u32, nameLen: *mut u32, name: *mut u16) -> HRESULT;
 }
-

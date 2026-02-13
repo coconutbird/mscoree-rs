@@ -11,10 +11,7 @@ use super::xclr_data_process::CLRDATA_ENUM;
 #[interface("4675666C-C275-45b8-9F6C-AB165D5C1E09")]
 pub unsafe trait IXCLRDataTypeDefinition: IUnknown {
     /// Get the module containing this type.
-    pub unsafe fn GetModule(
-        &self,
-        module: *mut *mut IUnknown,
-    ) -> HRESULT;
+    pub unsafe fn GetModule(&self, module: *mut *mut IUnknown) -> HRESULT;
 
     /// Begin enumeration of method definitions.
     pub unsafe fn StartEnumMethodDefinitions(&self, handle: *mut CLRDATA_ENUM) -> HRESULT;
@@ -74,11 +71,7 @@ pub unsafe trait IXCLRDataTypeDefinition: IUnknown {
     ) -> HRESULT;
 
     /// Get the token and scope for this type.
-    pub unsafe fn GetTokenAndScope(
-        &self,
-        token: *mut u32,
-        module: *mut *mut IUnknown,
-    ) -> HRESULT;
+    pub unsafe fn GetTokenAndScope(&self, token: *mut u32, module: *mut *mut IUnknown) -> HRESULT;
 
     /// Get the correlation ID.
     pub unsafe fn GetCorElementType(&self, r#type: *mut u32) -> HRESULT;
@@ -106,18 +99,10 @@ pub unsafe trait IXCLRDataTypeDefinition: IUnknown {
     pub unsafe fn GetBase(&self, base: *mut *mut IXCLRDataTypeDefinition) -> HRESULT;
 
     /// Get the number of fields.
-    pub unsafe fn GetNumFields(
-        &self,
-        flags: u32,
-        numFields: *mut u32,
-    ) -> HRESULT;
+    pub unsafe fn GetNumFields(&self, flags: u32, numFields: *mut u32) -> HRESULT;
 
     /// Begin enumeration of fields.
-    pub unsafe fn StartEnumFields(
-        &self,
-        flags: u32,
-        handle: *mut CLRDATA_ENUM,
-    ) -> HRESULT;
+    pub unsafe fn StartEnumFields(&self, flags: u32, handle: *mut CLRDATA_ENUM) -> HRESULT;
 
     /// Get the next field.
     pub unsafe fn EnumField(
@@ -143,4 +128,3 @@ pub unsafe trait IXCLRDataTypeDefinition: IUnknown {
         handle: *mut CLRDATA_ENUM,
     ) -> HRESULT;
 }
-

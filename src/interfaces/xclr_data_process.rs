@@ -75,28 +75,16 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
 
     /// Get the next task in the enumeration.
     /// Returns S_FALSE if there isn't a next entry.
-    pub unsafe fn EnumTask(
-        &self,
-        handle: *mut CLRDATA_ENUM,
-        task: *mut *mut IUnknown,
-    ) -> HRESULT;
+    pub unsafe fn EnumTask(&self, handle: *mut CLRDATA_ENUM, task: *mut *mut IUnknown) -> HRESULT;
 
     /// Release the task enumerator.
     pub unsafe fn EndEnumTasks(&self, handle: CLRDATA_ENUM) -> HRESULT;
 
     /// Get the managed task running on the given OS thread ID.
-    pub unsafe fn GetTaskByOSThreadID(
-        &self,
-        osThreadID: u32,
-        task: *mut *mut IUnknown,
-    ) -> HRESULT;
+    pub unsafe fn GetTaskByOSThreadID(&self, osThreadID: u32, task: *mut *mut IUnknown) -> HRESULT;
 
     /// Get the managed task corresponding to the given task ID.
-    pub unsafe fn GetTaskByUniqueID(
-        &self,
-        taskID: u64,
-        task: *mut *mut IUnknown,
-    ) -> HRESULT;
+    pub unsafe fn GetTaskByUniqueID(&self, taskID: u64, task: *mut *mut IUnknown) -> HRESULT;
 
     /// Get state flags (see CLRDataProcessFlag).
     pub unsafe fn GetFlags(&self, flags: *mut u32) -> HRESULT;
@@ -146,11 +134,7 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     pub unsafe fn EndEnumAppDomains(&self, handle: CLRDATA_ENUM) -> HRESULT;
 
     /// Find an app domain by its unique ID.
-    pub unsafe fn GetAppDomainByUniqueID(
-        &self,
-        id: u64,
-        appDomain: *mut *mut IUnknown,
-    ) -> HRESULT;
+    pub unsafe fn GetAppDomainByUniqueID(&self, id: u64, appDomain: *mut *mut IUnknown) -> HRESULT;
 
     /// Begin enumeration of assemblies.
     pub unsafe fn StartEnumAssemblies(&self, handle: *mut CLRDATA_ENUM) -> HRESULT;
@@ -252,18 +236,10 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     ) -> HRESULT;
 
     /// Update all type notifications for a module.
-    pub unsafe fn SetAllTypeNotifications(
-        &self,
-        module: *mut IUnknown,
-        flags: u32,
-    ) -> HRESULT;
+    pub unsafe fn SetAllTypeNotifications(&self, module: *mut IUnknown, flags: u32) -> HRESULT;
 
     /// Update all code notifications for a module.
-    pub unsafe fn SetAllCodeNotifications(
-        &self,
-        module: *mut IUnknown,
-        flags: u32,
-    ) -> HRESULT;
+    pub unsafe fn SetAllCodeNotifications(&self, module: *mut IUnknown, flags: u32) -> HRESULT;
 
     /// Get type notifications for tokens.
     pub unsafe fn GetTypeNotifications(

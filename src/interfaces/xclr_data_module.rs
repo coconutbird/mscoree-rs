@@ -3,7 +3,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-use windows::core::{HRESULT, IUnknown, IUnknown_Vtbl, interface, GUID};
+use windows::core::{GUID, HRESULT, IUnknown, IUnknown_Vtbl, interface};
 
 use super::xclr_data_process::CLRDATA_ENUM;
 use super::xclr_data_types::CLRDATA_METHDEF_EXTENT;
@@ -165,20 +165,10 @@ pub unsafe trait IXCLRDataModule: IUnknown {
     pub unsafe fn EndEnumDataByName(&self, handle: CLRDATA_ENUM) -> HRESULT;
 
     /// Get the name of this module.
-    pub unsafe fn GetName(
-        &self,
-        bufLen: u32,
-        nameLen: *mut u32,
-        name: *mut u16,
-    ) -> HRESULT;
+    pub unsafe fn GetName(&self, bufLen: u32, nameLen: *mut u32, name: *mut u16) -> HRESULT;
 
     /// Get the file name of this module.
-    pub unsafe fn GetFileName(
-        &self,
-        bufLen: u32,
-        nameLen: *mut u32,
-        name: *mut u16,
-    ) -> HRESULT;
+    pub unsafe fn GetFileName(&self, bufLen: u32, nameLen: *mut u32, name: *mut u16) -> HRESULT;
 
     /// Get the flags for this module.
     pub unsafe fn GetFlags(&self, flags: *mut u32) -> HRESULT;
@@ -225,4 +215,3 @@ pub unsafe trait IXCLRDataModule: IUnknown {
     /// Get version ID of this module.
     pub unsafe fn GetVersionId(&self, vid: *mut GUID) -> HRESULT;
 }
-

@@ -13,10 +13,7 @@ use super::xclr_data_types::CLRDATA_METHDEF_EXTENT;
 #[interface("AAF60008-FB2C-420B-8FB1-42D244A54A97")]
 pub unsafe trait IXCLRDataMethodDefinition: IUnknown {
     /// Get the type definition that contains this method.
-    pub unsafe fn GetTypeDefinition(
-        &self,
-        typeDefinition: *mut *mut IUnknown,
-    ) -> HRESULT;
+    pub unsafe fn GetTypeDefinition(&self, typeDefinition: *mut *mut IUnknown) -> HRESULT;
 
     /// Begin enumeration of method instances.
     pub unsafe fn StartEnumInstances(
@@ -45,11 +42,7 @@ pub unsafe trait IXCLRDataMethodDefinition: IUnknown {
     ) -> HRESULT;
 
     /// Get the token and scope for this method.
-    pub unsafe fn GetTokenAndScope(
-        &self,
-        token: *mut u32,
-        module: *mut *mut IUnknown,
-    ) -> HRESULT;
+    pub unsafe fn GetTokenAndScope(&self, token: *mut u32, module: *mut *mut IUnknown) -> HRESULT;
 
     /// Get flags for this method.
     pub unsafe fn GetFlags(&self, flags: *mut u32) -> HRESULT;
@@ -90,12 +83,8 @@ pub unsafe trait IXCLRDataMethodDefinition: IUnknown {
     pub unsafe fn SetCodeNotification(&self, flags: u32) -> HRESULT;
 
     /// Get representative entry address.
-    pub unsafe fn GetRepresentativeEntryAddress(
-        &self,
-        address: *mut CLRDATA_ADDRESS,
-    ) -> HRESULT;
+    pub unsafe fn GetRepresentativeEntryAddress(&self, address: *mut CLRDATA_ADDRESS) -> HRESULT;
 
     /// Check if this method has body.
     pub unsafe fn HasClassOrMethodInstantiation(&self, bGeneric: *mut i32) -> HRESULT;
 }
-

@@ -72,19 +72,23 @@ pub const IID_IXCLRDataAssembly: GUID = GUID::from_u128(0x2fa17588_43c2_46ab_9b5
 pub const IID_IXCLRDataModule: GUID = GUID::from_u128(0x88e32849_0a0a_4cb0_9022_7cd2e9e139e2);
 
 /// IID for IXCLRDataMethodInstance interface
-pub const IID_IXCLRDataMethodInstance: GUID = GUID::from_u128(0xecd73800_22ca_4b0d_ab55_e9ba7e6318a5);
+pub const IID_IXCLRDataMethodInstance: GUID =
+    GUID::from_u128(0xecd73800_22ca_4b0d_ab55_e9ba7e6318a5);
 
 /// IID for IXCLRDataMethodDefinition interface
-pub const IID_IXCLRDataMethodDefinition: GUID = GUID::from_u128(0xaaf60008_fb2c_420b_8fb1_42d244a54a97);
+pub const IID_IXCLRDataMethodDefinition: GUID =
+    GUID::from_u128(0xaaf60008_fb2c_420b_8fb1_42d244a54a97);
 
 /// IID for IXCLRDataValue interface
 pub const IID_IXCLRDataValue: GUID = GUID::from_u128(0x96ec93c7_1000_4e93_8991_98d8766e6666);
 
 /// IID for IXCLRDataExceptionState interface
-pub const IID_IXCLRDataExceptionState: GUID = GUID::from_u128(0x75da9e4c_bd33_43c8_8f5c_96e8a5241f57);
+pub const IID_IXCLRDataExceptionState: GUID =
+    GUID::from_u128(0x75da9e4c_bd33_43c8_8f5c_96e8a5241f57);
 
 /// IID for IXCLRDataExceptionNotification interface
-pub const IID_IXCLRDataExceptionNotification: GUID = GUID::from_u128(0x2d95a079_42a1_4837_818f_0b97d7048e0e);
+pub const IID_IXCLRDataExceptionNotification: GUID =
+    GUID::from_u128(0x2d95a079_42a1_4837_818f_0b97d7048e0e);
 
 /// IID for IXCLRDataTypeInstance interface
 pub const IID_IXCLRDataTypeInstance: GUID = GUID::from_u128(0x4d078d91_b8ff_4d18_aeee_f24c881f7384);
@@ -160,16 +164,20 @@ pub const IID_ISOSDacInterface16: GUID = GUID::from_u128(0x4ba12ff8_daac_4e43_ac
 // CLR Data Memory/Metadata Interface IIDs
 
 /// IID for ICLRDataEnumMemoryRegionsCallback interface
-pub const IID_ICLRDataEnumMemoryRegionsCallback: GUID = GUID::from_u128(0xbcdd6908_ba2d_4ec5_96cf_df4d5cdcb4a4);
+pub const IID_ICLRDataEnumMemoryRegionsCallback: GUID =
+    GUID::from_u128(0xbcdd6908_ba2d_4ec5_96cf_df4d5cdcb4a4);
 
 /// IID for ICLRDataEnumMemoryRegionsCallback2 interface
-pub const IID_ICLRDataEnumMemoryRegionsCallback2: GUID = GUID::from_u128(0x3721a26f_8b91_4d98_a388_db17b356fadb);
+pub const IID_ICLRDataEnumMemoryRegionsCallback2: GUID =
+    GUID::from_u128(0x3721a26f_8b91_4d98_a388_db17b356fadb);
 
 /// IID for ICLRDataLoggingCallback interface
-pub const IID_ICLRDataLoggingCallback: GUID = GUID::from_u128(0xf315248d_8b79_49db_b184_37426559f703);
+pub const IID_ICLRDataLoggingCallback: GUID =
+    GUID::from_u128(0xf315248d_8b79_49db_b184_37426559f703);
 
 /// IID for ICLRDataEnumMemoryRegions interface
-pub const IID_ICLRDataEnumMemoryRegions: GUID = GUID::from_u128(0x471c35b4_7c2f_4ef0_a945_00f8c38056f1);
+pub const IID_ICLRDataEnumMemoryRegions: GUID =
+    GUID::from_u128(0x471c35b4_7c2f_4ef0_a945_00f8c38056f1);
 
 /// IID for ICLRRuntimeLocator interface
 pub const IID_ICLRRuntimeLocator: GUID = GUID::from_u128(0xb760bf44_9377_4597_8be7_58083bdc5146);
@@ -192,16 +200,21 @@ pub const IID_IXCLRDataFrame: GUID = GUID::from_u128(0xab4d17d4_0016_4c1a_9aaf_d
 pub const IID_IXCLRDataFrame2: GUID = GUID::from_u128(0x1c4d9a4b_702d_4cf6_b290_1db6f43050d0);
 
 /// IID for IXCLRDataTypeDefinition interface
-pub const IID_IXCLRDataTypeDefinition: GUID = GUID::from_u128(0x4675666c_c275_45b8_9f6c_ab165d5c1e09);
+pub const IID_IXCLRDataTypeDefinition: GUID =
+    GUID::from_u128(0x4675666c_c275_45b8_9f6c_ab165d5c1e09);
 
 /// IID for IXCLRDataExceptionNotification2 interface
-pub const IID_IXCLRDataExceptionNotification2: GUID = GUID::from_u128(0x31201a94_4337_49b7_aef7_0c7550f0f3af);
+pub const IID_IXCLRDataExceptionNotification2: GUID =
+    GUID::from_u128(0x31201a94_4337_49b7_aef7_0c7550f0f3af);
 
 /// IID for IXCLRDataExceptionNotification3 interface
-pub const IID_IXCLRDataExceptionNotification3: GUID = GUID::from_u128(0x31201a94_4337_49b7_aef7_0c7550000003);
+pub const IID_IXCLRDataExceptionNotification3: GUID =
+    GUID::from_u128(0x31201a94_4337_49b7_aef7_0c7550000003);
 
 /// IID for IXCLRDataExceptionNotification4 interface
-pub const IID_IXCLRDataExceptionNotification4: GUID = GUID::from_u128(0xc25e926e_5f09_4aa2_bbad_b7fc7f10cfd7);
+pub const IID_IXCLRDataExceptionNotification4: GUID =
+    GUID::from_u128(0xc25e926e_5f09_4aa2_bbad_b7fc7f10cfd7);
 
 /// IID for IXCLRDataExceptionNotification5 interface
-pub const IID_IXCLRDataExceptionNotification5: GUID = GUID::from_u128(0xe77a39ea_3548_44d9_b171_8569ed1a9423);
+pub const IID_IXCLRDataExceptionNotification5: GUID =
+    GUID::from_u128(0xe77a39ea_3548_44d9_b171_8569ed1a9423);
