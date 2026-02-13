@@ -88,3 +88,71 @@ pub const IID_IXCLRDataExceptionNotification: GUID = GUID::from_u128(0x2d95a079_
 
 /// IID for IXCLRDataTypeInstance interface
 pub const IID_IXCLRDataTypeInstance: GUID = GUID::from_u128(0x4d078d91_b8ff_4d18_aeee_f24c881f7384);
+
+// SOS DAC Interface IIDs
+
+/// IID for ISOSEnum interface
+pub const IID_ISOSEnum: GUID = GUID::from_u128(0x286CA186_E763_4F61_9760_487D43AE4341);
+
+/// IID for ISOSHandleEnum interface
+pub const IID_ISOSHandleEnum: GUID = GUID::from_u128(0x3E269830_4A2B_4301_8EE2_D6805B29B2FA);
+
+/// IID for ISOSStackRefErrorEnum interface
+pub const IID_ISOSStackRefErrorEnum: GUID = GUID::from_u128(0x774F4E1B_FB7B_491B_976D_A8130FE355E9);
+
+/// IID for ISOSStackRefEnum interface
+pub const IID_ISOSStackRefEnum: GUID = GUID::from_u128(0x8FA642BD_9F10_4799_9AA3_512AE78C77EE);
+
+/// IID for ISOSMemoryEnum interface
+pub const IID_ISOSMemoryEnum: GUID = GUID::from_u128(0xE4B860EC_337A_40C0_A591_F09A9680690F);
+
+/// IID for ISOSMethodEnum interface
+pub const IID_ISOSMethodEnum: GUID = GUID::from_u128(0x3C0FE725_C324_4A4F_8100_D399588A662E);
+
+/// IID for ISOSDacInterface interface
+pub const IID_ISOSDacInterface: GUID = GUID::from_u128(0x436f00f2_b42a_4b9f_870c_e73db66ae930);
+
+/// IID for ISOSDacInterface2 interface
+pub const IID_ISOSDacInterface2: GUID = GUID::from_u128(0xA16026EC_96F4_40BA_87FB_5575986FB7AF);
+
+/// IID for ISOSDacInterface3 interface
+pub const IID_ISOSDacInterface3: GUID = GUID::from_u128(0xB08C5CDC_FD8A_49C5_AB38_5FEEF35235B4);
+
+/// IID for ISOSDacInterface4 interface
+pub const IID_ISOSDacInterface4: GUID = GUID::from_u128(0x74B9D34C_A612_4B07_93DD_5462178FCE11);
+
+/// IID for ISOSDacInterface5 interface
+pub const IID_ISOSDacInterface5: GUID = GUID::from_u128(0x127d6abe_6c86_4e48_8e7b_220781c58101);
+
+/// IID for ISOSDacInterface6 interface
+pub const IID_ISOSDacInterface6: GUID = GUID::from_u128(0x11206399_4B66_4EDB_98EA_85654E59AD45);
+
+/// IID for ISOSDacInterface7 interface
+pub const IID_ISOSDacInterface7: GUID = GUID::from_u128(0xc1020dde_fe98_4536_a53b_f35a74c327eb);
+
+/// IID for ISOSDacInterface8 interface
+pub const IID_ISOSDacInterface8: GUID = GUID::from_u128(0xc12f35a9_e55c_4520_a894_b3dc5165dfce);
+
+/// IID for ISOSDacInterface9 interface
+pub const IID_ISOSDacInterface9: GUID = GUID::from_u128(0x4eca42d8_7e7b_4c8a_a116_7bfbf6929267);
+
+/// IID for ISOSDacInterface10 interface
+pub const IID_ISOSDacInterface10: GUID = GUID::from_u128(0x90B8FCC3_7251_4B0A_AE3D_5C13A67EC9AA);
+
+/// IID for ISOSDacInterface11 interface
+pub const IID_ISOSDacInterface11: GUID = GUID::from_u128(0x96BA1DB9_14CD_4492_8065_1CAAECF6E5CF);
+
+/// IID for ISOSDacInterface12 interface
+pub const IID_ISOSDacInterface12: GUID = GUID::from_u128(0x1b93bacc_8ca4_432d_943a_3e6e7ec0b0a3);
+
+/// IID for ISOSDacInterface13 interface
+pub const IID_ISOSDacInterface13: GUID = GUID::from_u128(0x3176a8ed_597b_4f54_a71f_83695c6a8c5e);
+
+/// IID for ISOSDacInterface14 interface
+pub const IID_ISOSDacInterface14: GUID = GUID::from_u128(0x9aa22aca_6dc6_4a0c_b4e0_70d2416b9837);
+
+/// IID for ISOSDacInterface15 interface
+pub const IID_ISOSDacInterface15: GUID = GUID::from_u128(0x7ed81261_52a9_4a23_a358_c3313dea30a8);
+
+/// IID for ISOSDacInterface16 interface
+pub const IID_ISOSDacInterface16: GUID = GUID::from_u128(0x4ba12ff8_daac_4e43_ac56_98cf8d5c595d);
