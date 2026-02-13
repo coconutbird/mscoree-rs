@@ -1,6 +1,16 @@
 //! COM interface definitions for CLR hosting and debugging.
 
 mod clr_data;
+mod cor_debug;
+mod cor_debug_appdomain;
+mod cor_debug_callback;
+mod cor_debug_code;
+mod cor_debug_frame;
+mod cor_debug_module;
+mod cor_debug_process;
+mod cor_debug_stepper;
+mod cor_debug_thread;
+mod cor_debug_value;
 mod cor_runtime_host;
 mod data_target;
 mod metahost;
@@ -21,6 +31,16 @@ mod xclr_data_types;
 mod xclr_data_value;
 
 pub use clr_data::*;
+pub use cor_debug::*;
+pub use cor_debug_appdomain::*;
+pub use cor_debug_callback::*;
+pub use cor_debug_code::*;
+pub use cor_debug_frame::*;
+pub use cor_debug_module::*;
+pub use cor_debug_process::*;
+pub use cor_debug_stepper::*;
+pub use cor_debug_thread::*;
+pub use cor_debug_value::*;
 pub use cor_runtime_host::*;
 pub use data_target::*;
 pub use metahost::*;
