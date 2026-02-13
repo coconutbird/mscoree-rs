@@ -1,17 +1,41 @@
 //! COM interface definitions for CLR hosting and debugging.
 
+mod clr_data;
 mod cor_runtime_host;
 mod data_target;
 mod metahost;
 mod runtime_host;
 mod runtime_info;
 mod sos_dac;
+mod xclr_data_app_domain;
+mod xclr_data_assembly;
+mod xclr_data_exception;
+mod xclr_data_frame;
+mod xclr_data_method;
+mod xclr_data_module;
 mod xclr_data_process;
+mod xclr_data_stack_walk;
+mod xclr_data_task;
+mod xclr_data_type;
+mod xclr_data_types;
+mod xclr_data_value;
 
+pub use clr_data::*;
 pub use cor_runtime_host::*;
 pub use data_target::*;
 pub use metahost::*;
 pub use runtime_host::*;
 pub use runtime_info::*;
 pub use sos_dac::*;
+pub use xclr_data_app_domain::*;
+pub use xclr_data_assembly::*;
+pub use xclr_data_exception::*;
+pub use xclr_data_frame::*;
+pub use xclr_data_method::*;
+pub use xclr_data_module::*;
 pub use xclr_data_process::*;
+pub use xclr_data_stack_walk::*;
+pub use xclr_data_task::*;
+pub use xclr_data_type::*;
+pub use xclr_data_types::*;
+pub use xclr_data_value::*;

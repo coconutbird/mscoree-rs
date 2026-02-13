@@ -46,7 +46,7 @@ pub unsafe fn CLRCreateInstance<T: Interface>(clsid: &GUID) -> Result<T, Error> 
 
         // Get CLRCreateInstance function pointer
         let proc_name = s!("CLRCreateInstance");
-        let proc_addr = GetProcAddress(module, proc_name).ok_or_else(|| Error::from_win32())?;
+        let proc_addr = GetProcAddress(module, proc_name).ok_or_else(Error::from_win32)?;
 
         let clr_create_instance: CLRCreateInstanceFn = core::mem::transmute(proc_addr);
 

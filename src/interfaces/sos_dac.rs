@@ -11,7 +11,10 @@
 use windows::core::{HRESULT, IUnknown, IUnknown_Vtbl, interface};
 
 use super::data_target::CLRDATA_ADDRESS;
-use super::xclr_data_process::IXCLRDataModule;
+
+// Forward declaration for IXCLRDataModule
+#[interface("88E32849-0A0A-4CB0-9022-7CD2E9E139E2")]
+pub unsafe trait IXCLRDataModule_SOS: IUnknown {}
 
 /// Handle data for GC handles.
 #[repr(C)]
@@ -277,7 +280,7 @@ pub unsafe trait ISOSDacInterface: IUnknown {
     pub unsafe fn GetAssemblyName(&self, assembly: CLRDATA_ADDRESS, count: u32, name: *mut u16, pNeeded: *mut u32) -> HRESULT;
 
     // Modules
-    pub unsafe fn GetModule(&self, addr: CLRDATA_ADDRESS, module: *mut *mut IXCLRDataModule) -> HRESULT;
+    pub unsafe fn GetModule(&self, addr: CLRDATA_ADDRESS, module: *mut *mut IXCLRDataModule_SOS) -> HRESULT;
     pub unsafe fn GetModuleData(&self, moduleAddr: CLRDATA_ADDRESS, data: *mut DacpModuleData) -> HRESULT;
     pub unsafe fn TraverseModuleMap(&self, mmt: ModuleMapType, moduleAddr: CLRDATA_ADDRESS, pCallback: MODULEMAPTRAVERSE, token: *mut std::ffi::c_void) -> HRESULT;
     pub unsafe fn GetAssemblyModuleList(&self, assembly: CLRDATA_ADDRESS, count: u32, modules: *mut CLRDATA_ADDRESS, pNeeded: *mut u32) -> HRESULT;

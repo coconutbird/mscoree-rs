@@ -11,6 +11,7 @@
 use windows::core::{HRESULT, IUnknown, IUnknown_Vtbl, interface};
 
 use super::data_target::CLRDATA_ADDRESS;
+use super::xclr_data_types::GcEvtArgs;
 
 /// Opaque handle type for CLR data enumerations.
 pub type CLRDATA_ENUM = u64;
@@ -53,48 +54,9 @@ pub enum CLRDataAddressType {
     CLRDATA_ADDRESS_RUNTIME_UNMANAGED_STUB = 6,
 }
 
-// Forward declarations for related interfaces (defined as opaque IUnknown for now)
-// These can be implemented as full interfaces in separate files as needed.
-
-/// IXCLRDataTask - Represents a managed task (thread).
-#[interface("A5B0BEEA-EC62-4618-8012-A24FFC23934C")]
-pub unsafe trait IXCLRDataTask: IUnknown {}
-
-/// IXCLRDataAppDomain - Represents an application domain.
-#[interface("7CA04601-C702-4670-A63C-FA44F7DA7BD5")]
-pub unsafe trait IXCLRDataAppDomain: IUnknown {}
-
-/// IXCLRDataAssembly - Represents an assembly.
-#[interface("2FA17588-43C2-46AB-9B51-C8F01E39C9AC")]
-pub unsafe trait IXCLRDataAssembly: IUnknown {}
-
-/// IXCLRDataModule - Represents a managed module.
-#[interface("88E32849-0A0A-4CB0-9022-7CD2E9E139E2")]
-pub unsafe trait IXCLRDataModule: IUnknown {}
-
-/// IXCLRDataMethodInstance - Represents a method instance.
-#[interface("ECD73800-22CA-4B0D-AB55-E9BA7E6318A5")]
-pub unsafe trait IXCLRDataMethodInstance: IUnknown {}
-
-/// IXCLRDataMethodDefinition - Represents a method definition.
-#[interface("AAF60008-FB2C-420B-8FB1-42D244A54A97")]
-pub unsafe trait IXCLRDataMethodDefinition: IUnknown {}
-
-/// IXCLRDataValue - Represents a CLR value.
-#[interface("96EC93C7-1000-4E93-8991-98D8766E6666")]
-pub unsafe trait IXCLRDataValue: IUnknown {}
-
-/// IXCLRDataExceptionState - Represents exception state.
-#[interface("75DA9E4C-BD33-43C8-8F5C-96E8A5241F57")]
-pub unsafe trait IXCLRDataExceptionState: IUnknown {}
-
-/// IXCLRDataExceptionNotification - Exception notification callback.
-#[interface("2D95A079-42A1-4837-818F-0B97D7048E0E")]
-pub unsafe trait IXCLRDataExceptionNotification: IUnknown {}
-
-/// IXCLRDataTypeInstance - Represents a type instance.
-#[interface("4D078D91-B8FF-4D18-AEEE-F24C881F7384")]
-pub unsafe trait IXCLRDataTypeInstance: IUnknown {}
+// Note: All cross-interface references use IUnknown to avoid duplicate type definitions.
+// Users can cast the IUnknown pointers to the actual interface types (IXCLRDataTask, etc.)
+// by using QueryInterface.
 
 /// IXCLRDataProcess interface for CLR debugging (.NET 4.7+).
 ///
@@ -116,7 +78,7 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     pub unsafe fn EnumTask(
         &self,
         handle: *mut CLRDATA_ENUM,
-        task: *mut *mut IXCLRDataTask,
+        task: *mut *mut IUnknown,
     ) -> HRESULT;
 
     /// Release the task enumerator.
@@ -126,14 +88,14 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     pub unsafe fn GetTaskByOSThreadID(
         &self,
         osThreadID: u32,
-        task: *mut *mut IXCLRDataTask,
+        task: *mut *mut IUnknown,
     ) -> HRESULT;
 
     /// Get the managed task corresponding to the given task ID.
     pub unsafe fn GetTaskByUniqueID(
         &self,
         taskID: u64,
-        task: *mut *mut IXCLRDataTask,
+        task: *mut *mut IUnknown,
     ) -> HRESULT;
 
     /// Get state flags (see CLRDataProcessFlag).
@@ -143,7 +105,7 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     pub unsafe fn IsSameObject(&self, process: *mut IXCLRDataProcess) -> HRESULT;
 
     /// Get the managed object representing the process.
-    pub unsafe fn GetManagedObject(&self, value: *mut *mut IXCLRDataValue) -> HRESULT;
+    pub unsafe fn GetManagedObject(&self, value: *mut *mut IUnknown) -> HRESULT;
 
     /// Get the desired execution state.
     pub unsafe fn GetDesiredExecutionState(&self, state: *mut u32) -> HRESULT;
@@ -177,7 +139,7 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     pub unsafe fn EnumAppDomain(
         &self,
         handle: *mut CLRDATA_ENUM,
-        appDomain: *mut *mut IXCLRDataAppDomain,
+        appDomain: *mut *mut IUnknown,
     ) -> HRESULT;
 
     /// Release the app domain enumerator.
@@ -187,7 +149,7 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     pub unsafe fn GetAppDomainByUniqueID(
         &self,
         id: u64,
-        appDomain: *mut *mut IXCLRDataAppDomain,
+        appDomain: *mut *mut IUnknown,
     ) -> HRESULT;
 
     /// Begin enumeration of assemblies.
@@ -197,7 +159,7 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     pub unsafe fn EnumAssembly(
         &self,
         handle: *mut CLRDATA_ENUM,
-        assembly: *mut *mut IXCLRDataAssembly,
+        assembly: *mut *mut IUnknown,
     ) -> HRESULT;
 
     /// Release the assembly enumerator.
@@ -210,7 +172,7 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     pub unsafe fn EnumModule(
         &self,
         handle: *mut CLRDATA_ENUM,
-        module: *mut *mut IXCLRDataModule,
+        module: *mut *mut IUnknown,
     ) -> HRESULT;
 
     /// Release the module enumerator.
@@ -220,14 +182,14 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     pub unsafe fn GetModuleByAddress(
         &self,
         address: CLRDATA_ADDRESS,
-        module: *mut *mut IXCLRDataModule,
+        module: *mut *mut IUnknown,
     ) -> HRESULT;
 
     /// Begin enumeration of method instances by native code address.
     pub unsafe fn StartEnumMethodInstancesByAddress(
         &self,
         address: CLRDATA_ADDRESS,
-        appDomain: *mut IXCLRDataAppDomain,
+        appDomain: *mut IUnknown,
         handle: *mut CLRDATA_ENUM,
     ) -> HRESULT;
 
@@ -235,7 +197,7 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     pub unsafe fn EnumMethodInstanceByAddress(
         &self,
         handle: *mut CLRDATA_ENUM,
-        method: *mut *mut IXCLRDataMethodInstance,
+        method: *mut *mut IUnknown,
     ) -> HRESULT;
 
     /// Release the method instance enumerator.
@@ -246,12 +208,12 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
         &self,
         address: CLRDATA_ADDRESS,
         flags: u32,
-        appDomain: *mut IXCLRDataAppDomain,
-        tlsTask: *mut IXCLRDataTask,
+        appDomain: *mut IUnknown,
+        tlsTask: *mut IUnknown,
         bufLen: u32,
         nameLen: *mut u32,
         nameBuf: *mut u16,
-        value: *mut *mut IXCLRDataValue,
+        value: *mut *mut IUnknown,
         displacement: *mut CLRDATA_ADDRESS,
     ) -> HRESULT;
 
@@ -259,14 +221,14 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     pub unsafe fn GetExceptionStateByExceptionRecord(
         &self,
         record: *const EXCEPTION_RECORD64,
-        exState: *mut *mut IXCLRDataExceptionState,
+        exState: *mut *mut IUnknown,
     ) -> HRESULT;
 
     /// Translate a system exception record into a notification.
     pub unsafe fn TranslateExceptionRecordToNotification(
         &self,
         record: *const EXCEPTION_RECORD64,
-        notify: *mut IXCLRDataExceptionNotification,
+        notify: *mut IUnknown,
     ) -> HRESULT;
 
     /// Generic request operation.
@@ -282,24 +244,24 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     /// Create a simple value based on type and address.
     pub unsafe fn CreateMemoryValue(
         &self,
-        appDomain: *mut IXCLRDataAppDomain,
-        tlsTask: *mut IXCLRDataTask,
-        r#type: *mut IXCLRDataTypeInstance,
+        appDomain: *mut IUnknown,
+        tlsTask: *mut IUnknown,
+        r#type: *mut IUnknown,
         addr: CLRDATA_ADDRESS,
-        value: *mut *mut IXCLRDataValue,
+        value: *mut *mut IUnknown,
     ) -> HRESULT;
 
     /// Update all type notifications for a module.
     pub unsafe fn SetAllTypeNotifications(
         &self,
-        module: *mut IXCLRDataModule,
+        module: *mut IUnknown,
         flags: u32,
     ) -> HRESULT;
 
     /// Update all code notifications for a module.
     pub unsafe fn SetAllCodeNotifications(
         &self,
-        module: *mut IXCLRDataModule,
+        module: *mut IUnknown,
         flags: u32,
     ) -> HRESULT;
 
@@ -307,8 +269,8 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     pub unsafe fn GetTypeNotifications(
         &self,
         numTokens: u32,
-        mods: *mut *mut IXCLRDataModule,
-        singleMod: *mut IXCLRDataModule,
+        mods: *mut *mut IUnknown,
+        singleMod: *mut IUnknown,
         tokens: *const u32,
         flags: *mut u32,
     ) -> HRESULT;
@@ -317,8 +279,8 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     pub unsafe fn SetTypeNotifications(
         &self,
         numTokens: u32,
-        mods: *mut *mut IXCLRDataModule,
-        singleMod: *mut IXCLRDataModule,
+        mods: *mut *mut IUnknown,
+        singleMod: *mut IUnknown,
         tokens: *const u32,
         flags: *const u32,
         singleFlags: u32,
@@ -328,8 +290,8 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     pub unsafe fn GetCodeNotifications(
         &self,
         numTokens: u32,
-        mods: *mut *mut IXCLRDataModule,
-        singleMod: *mut IXCLRDataModule,
+        mods: *mut *mut IUnknown,
+        singleMod: *mut IUnknown,
         tokens: *const u32,
         flags: *mut u32,
     ) -> HRESULT;
@@ -338,8 +300,8 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     pub unsafe fn SetCodeNotifications(
         &self,
         numTokens: u32,
-        mods: *mut *mut IXCLRDataModule,
-        singleMod: *mut IXCLRDataModule,
+        mods: *mut *mut IUnknown,
+        singleMod: *mut IUnknown,
         tokens: *const u32,
         flags: *const u32,
         singleFlags: u32,
@@ -362,7 +324,7 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     pub unsafe fn EnumMethodDefinitionByAddress(
         &self,
         handle: *mut CLRDATA_ENUM,
-        method: *mut *mut IXCLRDataMethodDefinition,
+        method: *mut *mut IUnknown,
     ) -> HRESULT;
 
     /// Release the method definition enumerator.
@@ -382,7 +344,7 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     /// Follow a CLR stub with task context (requires revision 7).
     pub unsafe fn FollowStub2(
         &self,
-        task: *mut IXCLRDataTask,
+        task: *mut IUnknown,
         inFlags: u32,
         inAddr: CLRDATA_ADDRESS,
         inBuffer: *const CLRDATA_FOLLOW_STUB_BUFFER,
@@ -394,3 +356,12 @@ pub unsafe trait IXCLRDataProcess: IUnknown {
     // DumpNativeImage is omitted as it requires IXCLRDataDisplay and related interfaces
 }
 
+/// IXCLRDataProcess2 interface - Extended process interface.
+#[interface("5C552AB6-FC09-4CB3-8E36-22FA03C798B8")]
+pub unsafe trait IXCLRDataProcess2: IXCLRDataProcess {
+    /// Get GC notification flags.
+    pub unsafe fn GetGcNotification(&self, gcEvtArgs: *mut GcEvtArgs) -> HRESULT;
+
+    /// Set GC notification flags.
+    pub unsafe fn SetGcNotification(&self, gcEvtArgs: GcEvtArgs) -> HRESULT;
+}
