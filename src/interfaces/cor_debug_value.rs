@@ -138,9 +138,12 @@ pub unsafe trait ICorDebugHeapValue2: IUnknown {
 #[interface("A69ACAD8-2374-46E9-9FF8-B1F14120D296")]
 pub unsafe trait ICorDebugHeapValue3: IUnknown {
     /// Get the thread owning the monitor lock.
-    pub unsafe fn GetThreadOwningMonitorLock(&self, ppThread: *mut *mut IUnknown, pAcquisitionCount: *mut u32) -> HRESULT;
+    pub unsafe fn GetThreadOwningMonitorLock(
+        &self,
+        ppThread: *mut *mut IUnknown,
+        pAcquisitionCount: *mut u32,
+    ) -> HRESULT;
 
     /// Get threads waiting on the monitor lock.
     pub unsafe fn GetMonitorEventWaitList(&self, ppThreadEnum: *mut *mut IUnknown) -> HRESULT;
 }
-

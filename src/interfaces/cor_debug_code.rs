@@ -38,26 +38,49 @@ pub unsafe trait ICorDebugCode: IUnknown {
     pub unsafe fn GetSize(&self, pcBytes: *mut u32) -> HRESULT;
 
     /// Create a breakpoint at an offset.
-    pub unsafe fn CreateBreakpoint(&self, offset: u32, ppBreakpoint: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn CreateBreakpoint(&self, offset: u32, ppBreakpoint: *mut *mut IUnknown)
+    -> HRESULT;
 
     /// Get the code bytes.
-    pub unsafe fn GetCode(&self, startOffset: u32, endOffset: u32, cBufferAlloc: u32, buffer: *mut u8, pcBufferSize: *mut u32) -> HRESULT;
+    pub unsafe fn GetCode(
+        &self,
+        startOffset: u32,
+        endOffset: u32,
+        cBufferAlloc: u32,
+        buffer: *mut u8,
+        pcBufferSize: *mut u32,
+    ) -> HRESULT;
 
     /// Get the version number.
     pub unsafe fn GetVersionNumber(&self, nVersion: *mut u32) -> HRESULT;
 
     /// Get the IL to native mapping.
-    pub unsafe fn GetILToNativeMapping(&self, cMap: u32, pcMap: *mut u32, map: *mut c_void) -> HRESULT;
+    pub unsafe fn GetILToNativeMapping(
+        &self,
+        cMap: u32,
+        pcMap: *mut u32,
+        map: *mut c_void,
+    ) -> HRESULT;
 
     /// Get the EnC (Edit and Continue) remapped sequence points.
-    pub unsafe fn GetEnCRemapSequencePoints(&self, cMap: u32, pcMap: *mut u32, offsets: *mut u32) -> HRESULT;
+    pub unsafe fn GetEnCRemapSequencePoints(
+        &self,
+        cMap: u32,
+        pcMap: *mut u32,
+        offsets: *mut u32,
+    ) -> HRESULT;
 }
 
 /// ICorDebugCode2 - Extended code interface.
 #[interface("5F696509-452F-4436-A3FE-4D11FE7E2347")]
 pub unsafe trait ICorDebugCode2: IUnknown {
     /// Get the code chunks.
-    pub unsafe fn GetCodeChunks(&self, cbufSize: u32, pcnumChunks: *mut u32, chunks: *mut c_void) -> HRESULT;
+    pub unsafe fn GetCodeChunks(
+        &self,
+        cbufSize: u32,
+        pcnumChunks: *mut u32,
+        chunks: *mut c_void,
+    ) -> HRESULT;
 
     /// Get the compiler flags.
     pub unsafe fn GetCompilerFlags(&self, pdwFlags: *mut u32) -> HRESULT;
@@ -67,7 +90,13 @@ pub unsafe trait ICorDebugCode2: IUnknown {
 #[interface("D13D3E88-E1F2-4020-AA1D-3D162DCBE966")]
 pub unsafe trait ICorDebugCode3: IUnknown {
     /// Get the return value live offset.
-    pub unsafe fn GetReturnValueLiveOffset(&self, ilOffset: u32, bufferSize: u32, pFetched: *mut u32, pOffsets: *mut u32) -> HRESULT;
+    pub unsafe fn GetReturnValueLiveOffset(
+        &self,
+        ilOffset: u32,
+        bufferSize: u32,
+        pFetched: *mut u32,
+        pOffsets: *mut u32,
+    ) -> HRESULT;
 }
 
 /// ICorDebugCode4 - Code interface for local variables.
@@ -81,7 +110,12 @@ pub unsafe trait ICorDebugCode4: IUnknown {
 #[interface("598D46C2-C877-42A7-89D2-3D0C7F1C1264")]
 pub unsafe trait ICorDebugILCode: IUnknown {
     /// Get the EH (exception handling) clauses.
-    pub unsafe fn GetEHClauses(&self, cClauses: u32, pcClauses: *mut u32, clauses: *mut c_void) -> HRESULT;
+    pub unsafe fn GetEHClauses(
+        &self,
+        cClauses: u32,
+        pcClauses: *mut u32,
+        clauses: *mut c_void,
+    ) -> HRESULT;
 }
 
 /// ICorDebugILCode2 - Extended IL code interface.
@@ -91,7 +125,12 @@ pub unsafe trait ICorDebugILCode2: IUnknown {
     pub unsafe fn GetLocalVarSigToken(&self, pmdSig: *mut u32) -> HRESULT;
 
     /// Get instrumented IL map.
-    pub unsafe fn GetInstrumentedILMap(&self, cMap: u32, pcMap: *mut u32, map: *mut c_void) -> HRESULT;
+    pub unsafe fn GetInstrumentedILMap(
+        &self,
+        cMap: u32,
+        pcMap: *mut u32,
+        map: *mut c_void,
+    ) -> HRESULT;
 }
 
 /// ICorDebugChain - Represents a chain of stack frames.
@@ -157,12 +196,27 @@ pub unsafe trait ICorDebugRegisterSet: IUnknown {
 #[interface("6DC7BA3F-89BA-4459-9EC1-9D60937B468D")]
 pub unsafe trait ICorDebugRegisterSet2: IUnknown {
     /// Get the available registers mask (extended).
-    pub unsafe fn GetRegistersAvailable(&self, numChunks: u32, availableRegChunks: *mut u8) -> HRESULT;
+    pub unsafe fn GetRegistersAvailable(
+        &self,
+        numChunks: u32,
+        availableRegChunks: *mut u8,
+    ) -> HRESULT;
 
     /// Get register values (extended).
-    pub unsafe fn GetRegisters(&self, maskCount: u32, mask: *const u8, regCount: u32, regBuffer: *mut u64) -> HRESULT;
+    pub unsafe fn GetRegisters(
+        &self,
+        maskCount: u32,
+        mask: *const u8,
+        regCount: u32,
+        regBuffer: *mut u64,
+    ) -> HRESULT;
 
     /// Set register values (extended).
-    pub unsafe fn SetRegisters(&self, maskCount: u32, mask: *const u8, regCount: u32, regBuffer: *const u64) -> HRESULT;
+    pub unsafe fn SetRegisters(
+        &self,
+        maskCount: u32,
+        mask: *const u8,
+        regCount: u32,
+        regBuffer: *const u64,
+    ) -> HRESULT;
 }
-

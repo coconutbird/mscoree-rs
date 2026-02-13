@@ -75,11 +75,8 @@ pub unsafe trait ICorDebug: IUnknown {
     pub unsafe fn GetProcess(&self, dwProcessId: u32, ppProcess: *mut *mut IUnknown) -> HRESULT;
 
     /// Check if a debugger can launch a process.
-    pub unsafe fn CanLaunchOrAttach(
-        &self,
-        dwProcessId: u32,
-        win32DebuggingEnabled: i32,
-    ) -> HRESULT;
+    pub unsafe fn CanLaunchOrAttach(&self, dwProcessId: u32, win32DebuggingEnabled: i32)
+    -> HRESULT;
 }
 
 /// ICorDebug2 - Extended debugging interface.
@@ -101,11 +98,7 @@ pub unsafe trait ICorDebugController: IUnknown {
     pub unsafe fn IsRunning(&self, pbRunning: *mut i32) -> HRESULT;
 
     /// Check if there are queued callbacks.
-    pub unsafe fn HasQueuedCallbacks(
-        &self,
-        pThread: *mut IUnknown,
-        pbQueued: *mut i32,
-    ) -> HRESULT;
+    pub unsafe fn HasQueuedCallbacks(&self, pThread: *mut IUnknown, pbQueued: *mut i32) -> HRESULT;
 
     /// Enumerate all threads.
     pub unsafe fn EnumerateThreads(&self, ppThreads: *mut *mut IUnknown) -> HRESULT;
@@ -139,4 +132,3 @@ pub unsafe trait ICorDebugController: IUnknown {
         pError: *mut *mut IUnknown,
     ) -> HRESULT;
 }
-

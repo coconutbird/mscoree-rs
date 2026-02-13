@@ -74,7 +74,12 @@ pub unsafe trait ICorDebugThread: IUnknown {
 #[interface("2BD956D9-7B07-4BEF-8A98-12AA862417C5")]
 pub unsafe trait ICorDebugThread2: IUnknown {
     /// Get the active functions on this thread.
-    pub unsafe fn GetActiveFunctions(&self, cFunctions: u32, pcFunctions: *mut u32, pFunctions: *mut c_void) -> HRESULT;
+    pub unsafe fn GetActiveFunctions(
+        &self,
+        cFunctions: u32,
+        pcFunctions: *mut u32,
+        pFunctions: *mut c_void,
+    ) -> HRESULT;
 
     /// Get the connection ID.
     pub unsafe fn GetConnectionID(&self, pdwConnectionId: *mut u32) -> HRESULT;
@@ -96,7 +101,12 @@ pub unsafe trait ICorDebugThread3: IUnknown {
     pub unsafe fn CreateStackWalk(&self, ppStackWalk: *mut *mut IUnknown) -> HRESULT;
 
     /// Get the active internal frames.
-    pub unsafe fn GetActiveInternalFrames(&self, cInternalFrames: u32, pcInternalFrames: *mut u32, ppInternalFrames: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn GetActiveInternalFrames(
+        &self,
+        cInternalFrames: u32,
+        pcInternalFrames: *mut u32,
+        ppInternalFrames: *mut *mut IUnknown,
+    ) -> HRESULT;
 }
 
 /// ICorDebugThread4 - Thread interface for blocking info.
@@ -109,6 +119,8 @@ pub unsafe trait ICorDebugThread4: IUnknown {
     pub unsafe fn GetBlockingObjects(&self, ppBlockingObjectEnum: *mut *mut IUnknown) -> HRESULT;
 
     /// Get the current custom debugger notification.
-    pub unsafe fn GetCurrentCustomDebuggerNotification(&self, ppNotificationObject: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn GetCurrentCustomDebuggerNotification(
+        &self,
+        ppNotificationObject: *mut *mut IUnknown,
+    ) -> HRESULT;
 }
-

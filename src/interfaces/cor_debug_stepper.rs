@@ -116,10 +116,20 @@ pub unsafe trait ICorDebugValueBreakpoint: IUnknown {
 #[interface("CC7BCAF6-8A68-11D2-983C-0000F808342D")]
 pub unsafe trait ICorDebugEval: IUnknown {
     /// Call a function.
-    pub unsafe fn CallFunction(&self, pFunction: *mut IUnknown, nArgs: u32, ppArgs: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn CallFunction(
+        &self,
+        pFunction: *mut IUnknown,
+        nArgs: u32,
+        ppArgs: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Create a new object.
-    pub unsafe fn NewObject(&self, pConstructor: *mut IUnknown, nArgs: u32, ppArgs: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn NewObject(
+        &self,
+        pConstructor: *mut IUnknown,
+        nArgs: u32,
+        ppArgs: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Create a new object without calling constructor.
     pub unsafe fn NewObjectNoConstructor(&self, pClass: *mut IUnknown) -> HRESULT;
@@ -128,7 +138,14 @@ pub unsafe trait ICorDebugEval: IUnknown {
     pub unsafe fn NewString(&self, string: *const u16) -> HRESULT;
 
     /// Create a new array.
-    pub unsafe fn NewArray(&self, elementType: u32, pElementClass: *mut IUnknown, rank: u32, dims: *const u32, lowBounds: *const u32) -> HRESULT;
+    pub unsafe fn NewArray(
+        &self,
+        elementType: u32,
+        pElementClass: *mut IUnknown,
+        rank: u32,
+        dims: *const u32,
+        lowBounds: *const u32,
+    ) -> HRESULT;
 
     /// Check if eval is active.
     pub unsafe fn IsActive(&self, pbActive: *mut i32) -> HRESULT;
@@ -143,26 +160,60 @@ pub unsafe trait ICorDebugEval: IUnknown {
     pub unsafe fn GetThread(&self, ppThread: *mut *mut IUnknown) -> HRESULT;
 
     /// Create a value.
-    pub unsafe fn CreateValue(&self, elementType: u32, pElementClass: *mut IUnknown, ppValue: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn CreateValue(
+        &self,
+        elementType: u32,
+        pElementClass: *mut IUnknown,
+        ppValue: *mut *mut IUnknown,
+    ) -> HRESULT;
 }
 
 /// ICorDebugEval2 - Extended eval interface.
 #[interface("FB0D9CE7-BE66-4683-9D32-A42A04E2FD91")]
 pub unsafe trait ICorDebugEval2: IUnknown {
     /// Call a function with type arguments.
-    pub unsafe fn CallParameterizedFunction(&self, pFunction: *mut IUnknown, nTypeArgs: u32, ppTypeArgs: *mut *mut IUnknown, nArgs: u32, ppArgs: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn CallParameterizedFunction(
+        &self,
+        pFunction: *mut IUnknown,
+        nTypeArgs: u32,
+        ppTypeArgs: *mut *mut IUnknown,
+        nArgs: u32,
+        ppArgs: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Create a value with type.
-    pub unsafe fn CreateValueForType(&self, pType: *mut IUnknown, ppValue: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn CreateValueForType(
+        &self,
+        pType: *mut IUnknown,
+        ppValue: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Create a new object with type arguments.
-    pub unsafe fn NewParameterizedObject(&self, pConstructor: *mut IUnknown, nTypeArgs: u32, ppTypeArgs: *mut *mut IUnknown, nArgs: u32, ppArgs: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn NewParameterizedObject(
+        &self,
+        pConstructor: *mut IUnknown,
+        nTypeArgs: u32,
+        ppTypeArgs: *mut *mut IUnknown,
+        nArgs: u32,
+        ppArgs: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Create a new object without constructor with type arguments.
-    pub unsafe fn NewParameterizedObjectNoConstructor(&self, pClass: *mut IUnknown, nTypeArgs: u32, ppTypeArgs: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn NewParameterizedObjectNoConstructor(
+        &self,
+        pClass: *mut IUnknown,
+        nTypeArgs: u32,
+        ppTypeArgs: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Create a new array with type arguments.
-    pub unsafe fn NewParameterizedArray(&self, pElementType: *mut IUnknown, rank: u32, dims: *const u32, lowBounds: *const u32) -> HRESULT;
+    pub unsafe fn NewParameterizedArray(
+        &self,
+        pElementType: *mut IUnknown,
+        rank: u32,
+        dims: *const u32,
+        lowBounds: *const u32,
+    ) -> HRESULT;
 
     /// Create a new string with length.
     pub unsafe fn NewStringWithLength(&self, string: *const u16, uiLength: u32) -> HRESULT;
@@ -170,4 +221,3 @@ pub unsafe trait ICorDebugEval2: IUnknown {
     /// Rude abort the eval.
     pub unsafe fn RudeAbort(&self) -> HRESULT;
 }
-

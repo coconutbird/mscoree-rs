@@ -99,17 +99,30 @@ pub unsafe trait ICorDebugILFrame2: IUnknown {
 #[interface("9A9E2ED6-04DF-4FE0-BB50-CAB64126619A")]
 pub unsafe trait ICorDebugILFrame3: IUnknown {
     /// Get the return value.
-    pub unsafe fn GetReturnValueForILOffset(&self, ilOffset: u32, ppReturnValue: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn GetReturnValueForILOffset(
+        &self,
+        ilOffset: u32,
+        ppReturnValue: *mut *mut IUnknown,
+    ) -> HRESULT;
 }
 
 /// ICorDebugILFrame4 - IL frame interface for local variables.
 #[interface("AD914A30-C6D1-4AC5-9C5E-577F3BAA8A45")]
 pub unsafe trait ICorDebugILFrame4: IUnknown {
     /// Enumerate local variables with extra info.
-    pub unsafe fn EnumerateLocalVariablesEx(&self, flags: u32, ppValueEnum: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn EnumerateLocalVariablesEx(
+        &self,
+        flags: u32,
+        ppValueEnum: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Get a local variable with extra info.
-    pub unsafe fn GetLocalVariableEx(&self, flags: u32, dwIndex: u32, ppValue: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn GetLocalVariableEx(
+        &self,
+        flags: u32,
+        dwIndex: u32,
+        ppValue: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Get the code with extra info.
     pub unsafe fn GetCodeEx(&self, flags: u32, ppCode: *mut *mut IUnknown) -> HRESULT;
@@ -139,21 +152,53 @@ pub unsafe trait ICorDebugNativeFrame: IUnknown {
     pub unsafe fn GetRegisterSet(&self, ppRegisters: *mut *mut IUnknown) -> HRESULT;
 
     /// Get a local register value.
-    pub unsafe fn GetLocalRegisterValue(&self, reg: u32, cbSigBlob: u32, pvSigBlob: *const u8, ppValue: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn GetLocalRegisterValue(
+        &self,
+        reg: u32,
+        cbSigBlob: u32,
+        pvSigBlob: *const u8,
+        ppValue: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Get a local double register value.
-    pub unsafe fn GetLocalDoubleRegisterValue(&self, highWordReg: u32, lowWordReg: u32, cbSigBlob: u32, pvSigBlob: *const u8, ppValue: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn GetLocalDoubleRegisterValue(
+        &self,
+        highWordReg: u32,
+        lowWordReg: u32,
+        cbSigBlob: u32,
+        pvSigBlob: *const u8,
+        ppValue: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Get a local memory value.
-    pub unsafe fn GetLocalMemoryValue(&self, address: u64, cbSigBlob: u32, pvSigBlob: *const u8, ppValue: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn GetLocalMemoryValue(
+        &self,
+        address: u64,
+        cbSigBlob: u32,
+        pvSigBlob: *const u8,
+        ppValue: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Get a local register-memory value.
-    pub unsafe fn GetLocalRegisterMemoryValue(&self, highWordReg: u32, lowWordAddress: u64, cbSigBlob: u32, pvSigBlob: *const u8, ppValue: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn GetLocalRegisterMemoryValue(
+        &self,
+        highWordReg: u32,
+        lowWordAddress: u64,
+        cbSigBlob: u32,
+        pvSigBlob: *const u8,
+        ppValue: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Get a local memory-register value.
-    pub unsafe fn GetLocalMemoryRegisterValue(&self, highWordAddress: u64, lowWordReg: u32, cbSigBlob: u32, pvSigBlob: *const u8, ppValue: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn GetLocalMemoryRegisterValue(
+        &self,
+        highWordAddress: u64,
+        lowWordReg: u32,
+        cbSigBlob: u32,
+        pvSigBlob: *const u8,
+        ppValue: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Check if SetIP is possible.
     pub unsafe fn CanSetIP(&self, nOffset: u32) -> HRESULT;
 }
-

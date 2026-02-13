@@ -28,11 +28,25 @@ pub unsafe trait ICorDebugProcess: IUnknown {
     pub unsafe fn IsRunning(&self, pbRunning: *mut i32) -> HRESULT;
     pub unsafe fn HasQueuedCallbacks(&self, pThread: *mut IUnknown, pbQueued: *mut i32) -> HRESULT;
     pub unsafe fn EnumerateThreads(&self, ppThreads: *mut *mut IUnknown) -> HRESULT;
-    pub unsafe fn SetAllThreadsDebugState(&self, state: u32, pExceptThisThread: *mut IUnknown) -> HRESULT;
+    pub unsafe fn SetAllThreadsDebugState(
+        &self,
+        state: u32,
+        pExceptThisThread: *mut IUnknown,
+    ) -> HRESULT;
     pub unsafe fn Detach(&self) -> HRESULT;
     pub unsafe fn Terminate(&self, exitCode: u32) -> HRESULT;
-    pub unsafe fn CanCommitChanges(&self, cSnapshots: u32, pSnapshots: *mut *mut IUnknown, pError: *mut *mut IUnknown) -> HRESULT;
-    pub unsafe fn CommitChanges(&self, cSnapshots: u32, pSnapshots: *mut *mut IUnknown, pError: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn CanCommitChanges(
+        &self,
+        cSnapshots: u32,
+        pSnapshots: *mut *mut IUnknown,
+        pError: *mut *mut IUnknown,
+    ) -> HRESULT;
+    pub unsafe fn CommitChanges(
+        &self,
+        cSnapshots: u32,
+        pSnapshots: *mut *mut IUnknown,
+        pError: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     // ICorDebugProcess methods
     /// Get the OS process ID.
@@ -54,16 +68,38 @@ pub unsafe trait ICorDebugProcess: IUnknown {
     pub unsafe fn IsOSSuspended(&self, threadID: u32, pbSuspended: *mut i32) -> HRESULT;
 
     /// Get the thread context.
-    pub unsafe fn GetThreadContext(&self, threadID: u32, contextSize: u32, context: *mut u8) -> HRESULT;
+    pub unsafe fn GetThreadContext(
+        &self,
+        threadID: u32,
+        contextSize: u32,
+        context: *mut u8,
+    ) -> HRESULT;
 
     /// Set the thread context.
-    pub unsafe fn SetThreadContext(&self, threadID: u32, contextSize: u32, context: *const u8) -> HRESULT;
+    pub unsafe fn SetThreadContext(
+        &self,
+        threadID: u32,
+        contextSize: u32,
+        context: *const u8,
+    ) -> HRESULT;
 
     /// Read memory from the process.
-    pub unsafe fn ReadMemory(&self, address: u64, size: u32, buffer: *mut u8, read: *mut u32) -> HRESULT;
+    pub unsafe fn ReadMemory(
+        &self,
+        address: u64,
+        size: u32,
+        buffer: *mut u8,
+        read: *mut u32,
+    ) -> HRESULT;
 
     /// Write memory to the process.
-    pub unsafe fn WriteMemory(&self, address: u64, size: u32, buffer: *const u8, written: *mut u32) -> HRESULT;
+    pub unsafe fn WriteMemory(
+        &self,
+        address: u64,
+        size: u32,
+        buffer: *const u8,
+        written: *mut u32,
+    ) -> HRESULT;
 
     /// Clear the current exception on a thread.
     pub unsafe fn ClearCurrentException(&self, threadID: u32) -> HRESULT;
@@ -81,7 +117,11 @@ pub unsafe trait ICorDebugProcess: IUnknown {
     pub unsafe fn GetObject(&self, ppObject: *mut *mut IUnknown) -> HRESULT;
 
     /// Get a thread by its CLR thread ID.
-    pub unsafe fn ThreadForFiberCookie(&self, fiberCookie: u32, ppThread: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn ThreadForFiberCookie(
+        &self,
+        fiberCookie: u32,
+        ppThread: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Get the helper thread ID.
     pub unsafe fn GetHelperThreadID(&self, pThreadID: *mut u32) -> HRESULT;
@@ -97,7 +137,13 @@ pub unsafe trait ICorDebugProcess2: IUnknown {
     pub unsafe fn GetVersion(&self, version: *mut u64) -> HRESULT;
 
     /// Set unmanaged breakpoint.
-    pub unsafe fn SetUnmanagedBreakpoint(&self, address: u64, bufsize: u32, buffer: *mut u8, bufLen: *mut u32) -> HRESULT;
+    pub unsafe fn SetUnmanagedBreakpoint(
+        &self,
+        address: u64,
+        bufsize: u32,
+        buffer: *mut u8,
+        bufLen: *mut u32,
+    ) -> HRESULT;
 
     /// Clear unmanaged breakpoint.
     pub unsafe fn ClearUnmanagedBreakpoint(&self, address: u64) -> HRESULT;
@@ -109,7 +155,11 @@ pub unsafe trait ICorDebugProcess2: IUnknown {
     pub unsafe fn GetDesiredNGENCompilerFlags(&self, pdwFlags: *mut u32) -> HRESULT;
 
     /// Get a reference value for an object.
-    pub unsafe fn GetReferenceValueFromGCHandle(&self, handle: u64, pOutValue: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn GetReferenceValueFromGCHandle(
+        &self,
+        handle: u64,
+        pOutValue: *mut *mut IUnknown,
+    ) -> HRESULT;
 }
 
 /// ICorDebugProcess4 - Process interface for exception handling.
@@ -146,10 +196,19 @@ pub unsafe trait ICorDebugProcess5: IUnknown {
     pub unsafe fn GetObject(&self, addr: u64, pObject: *mut *mut IUnknown) -> HRESULT;
 
     /// Enumerate GC references for an object.
-    pub unsafe fn EnumerateGCReferences(&self, enumerateWeakReferences: i32, ppEnum: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn EnumerateGCReferences(
+        &self,
+        enumerateWeakReferences: i32,
+        ppEnum: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Enumerate handles.
-    pub unsafe fn EnumerateHandles(&self, types: *const u32, numTypes: u32, ppEnum: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn EnumerateHandles(
+        &self,
+        types: *const u32,
+        numTypes: u32,
+        ppEnum: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Get type ID for a type.
     pub unsafe fn GetTypeID(&self, obj: u64, pId: *mut c_void) -> HRESULT;
@@ -164,7 +223,13 @@ pub unsafe trait ICorDebugProcess5: IUnknown {
     pub unsafe fn GetTypeLayout(&self, id: c_void, pLayout: *mut c_void) -> HRESULT;
 
     /// Get type fields.
-    pub unsafe fn GetTypeFields(&self, id: c_void, celt: u32, fields: *mut c_void, pceltNeeded: *mut u32) -> HRESULT;
+    pub unsafe fn GetTypeFields(
+        &self,
+        id: c_void,
+        celt: u32,
+        fields: *mut c_void,
+        pceltNeeded: *mut u32,
+    ) -> HRESULT;
 
     /// Enable NGEN policy.
     pub unsafe fn EnableNGENPolicy(&self, ePolicy: u32) -> HRESULT;
@@ -216,7 +281,10 @@ pub unsafe trait ICorDebugProcess7: IUnknown {
 #[interface("2E6F28C1-85EB-4141-80AD-0A90944B9639")]
 pub unsafe trait ICorDebugProcess8: IUnknown {
     /// Enable exception callbacks outside of JMC code.
-    pub unsafe fn EnableExceptionCallbacksOutsideOfMyCode(&self, enableExceptionsOutsideOfJMC: i32) -> HRESULT;
+    pub unsafe fn EnableExceptionCallbacksOutsideOfMyCode(
+        &self,
+        enableExceptionsOutsideOfJMC: i32,
+    ) -> HRESULT;
 }
 
 /// ICorDebugProcess10 - Process interface for .NET Core 3.0+.

@@ -11,11 +11,25 @@ pub unsafe trait ICorDebugAppDomain: IUnknown {
     pub unsafe fn IsRunning(&self, pbRunning: *mut i32) -> HRESULT;
     pub unsafe fn HasQueuedCallbacks(&self, pThread: *mut IUnknown, pbQueued: *mut i32) -> HRESULT;
     pub unsafe fn EnumerateThreads(&self, ppThreads: *mut *mut IUnknown) -> HRESULT;
-    pub unsafe fn SetAllThreadsDebugState(&self, state: u32, pExceptThisThread: *mut IUnknown) -> HRESULT;
+    pub unsafe fn SetAllThreadsDebugState(
+        &self,
+        state: u32,
+        pExceptThisThread: *mut IUnknown,
+    ) -> HRESULT;
     pub unsafe fn Detach(&self) -> HRESULT;
     pub unsafe fn Terminate(&self, exitCode: u32) -> HRESULT;
-    pub unsafe fn CanCommitChanges(&self, cSnapshots: u32, pSnapshots: *mut *mut IUnknown, pError: *mut *mut IUnknown) -> HRESULT;
-    pub unsafe fn CommitChanges(&self, cSnapshots: u32, pSnapshots: *mut *mut IUnknown, pError: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn CanCommitChanges(
+        &self,
+        cSnapshots: u32,
+        pSnapshots: *mut *mut IUnknown,
+        pError: *mut *mut IUnknown,
+    ) -> HRESULT;
+    pub unsafe fn CommitChanges(
+        &self,
+        cSnapshots: u32,
+        pSnapshots: *mut *mut IUnknown,
+        pError: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     // ICorDebugAppDomain methods
     /// Get the process containing this app domain.
@@ -25,7 +39,11 @@ pub unsafe trait ICorDebugAppDomain: IUnknown {
     pub unsafe fn EnumerateAssemblies(&self, ppAssemblies: *mut *mut IUnknown) -> HRESULT;
 
     /// Get the module containing the metadata token.
-    pub unsafe fn GetModuleFromMetaDataInterface(&self, pIMetaData: *mut IUnknown, ppModule: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn GetModuleFromMetaDataInterface(
+        &self,
+        pIMetaData: *mut IUnknown,
+        ppModule: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Enumerate all breakpoints in this app domain.
     pub unsafe fn EnumerateBreakpoints(&self, ppBreakpoints: *mut *mut IUnknown) -> HRESULT;
@@ -89,7 +107,11 @@ pub unsafe trait ICorDebugAppDomain3: IUnknown {
 #[interface("FB99CC40-83BE-4724-AB3B-768E796EBAC2")]
 pub unsafe trait ICorDebugAppDomain4: IUnknown {
     /// Get the object for a COM callable wrapper.
-    pub unsafe fn GetObjectForCCW(&self, ccwPointer: u64, ppManagedObject: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn GetObjectForCCW(
+        &self,
+        ccwPointer: u64,
+        ppManagedObject: *mut *mut IUnknown,
+    ) -> HRESULT;
 }
 
 /// ICorDebugAssembly - Represents an assembly.
@@ -105,7 +127,8 @@ pub unsafe trait ICorDebugAssembly: IUnknown {
     pub unsafe fn EnumerateModules(&self, ppModules: *mut *mut IUnknown) -> HRESULT;
 
     /// Get the code base of this assembly.
-    pub unsafe fn GetCodeBase(&self, cchName: u32, pcchName: *mut u32, szName: *mut u16) -> HRESULT;
+    pub unsafe fn GetCodeBase(&self, cchName: u32, pcchName: *mut u32, szName: *mut u16)
+    -> HRESULT;
 
     /// Get the name of this assembly.
     pub unsafe fn GetName(&self, cchName: u32, pcchName: *mut u32, szName: *mut u16) -> HRESULT;
@@ -127,4 +150,3 @@ pub unsafe trait ICorDebugAssembly3: IUnknown {
     /// Enumerate contained assemblies.
     pub unsafe fn EnumerateContainedAssemblies(&self, ppAssemblies: *mut *mut IUnknown) -> HRESULT;
 }
-

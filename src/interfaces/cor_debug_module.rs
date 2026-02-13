@@ -25,7 +25,11 @@ pub unsafe trait ICorDebugModule: IUnknown {
     pub unsafe fn EnableClassLoadCallbacks(&self, bClassLoadCallbacks: i32) -> HRESULT;
 
     /// Get a function by metadata token.
-    pub unsafe fn GetFunctionFromToken(&self, methodDef: u32, ppFunction: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn GetFunctionFromToken(
+        &self,
+        methodDef: u32,
+        ppFunction: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Get a function by RVA.
     pub unsafe fn GetFunctionFromRVA(&self, rva: u64, ppFunction: *mut *mut IUnknown) -> HRESULT;
@@ -37,10 +41,17 @@ pub unsafe trait ICorDebugModule: IUnknown {
     pub unsafe fn CreateBreakpoint(&self, ppBreakpoint: *mut *mut IUnknown) -> HRESULT;
 
     /// Get the edit and continue snapshot.
-    pub unsafe fn GetEditAndContinueSnapshot(&self, ppEditAndContinueSnapshot: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn GetEditAndContinueSnapshot(
+        &self,
+        ppEditAndContinueSnapshot: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Get the metadata interface.
-    pub unsafe fn GetMetaDataInterface(&self, riid: *const windows::core::GUID, ppObj: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn GetMetaDataInterface(
+        &self,
+        riid: *const windows::core::GUID,
+        ppObj: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Get the token for this module.
     pub unsafe fn GetToken(&self, pToken: *mut u32) -> HRESULT;
@@ -49,7 +60,11 @@ pub unsafe trait ICorDebugModule: IUnknown {
     pub unsafe fn IsDynamic(&self, pDynamic: *mut i32) -> HRESULT;
 
     /// Get a global variable by metadata token.
-    pub unsafe fn GetGlobalVariableValue(&self, fieldDef: u32, ppValue: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn GetGlobalVariableValue(
+        &self,
+        fieldDef: u32,
+        ppValue: *mut *mut IUnknown,
+    ) -> HRESULT;
 
     /// Get the size of this module.
     pub unsafe fn GetSize(&self, pcBytes: *mut u32) -> HRESULT;
@@ -62,10 +77,21 @@ pub unsafe trait ICorDebugModule: IUnknown {
 #[interface("7FCC5FB5-49C0-41DE-9938-3B88B5B9ADD7")]
 pub unsafe trait ICorDebugModule2: IUnknown {
     /// Set JMC (Just My Code) status.
-    pub unsafe fn SetJMCStatus(&self, bIsJustMyCode: i32, cTokens: u32, pTokens: *const u32) -> HRESULT;
+    pub unsafe fn SetJMCStatus(
+        &self,
+        bIsJustMyCode: i32,
+        cTokens: u32,
+        pTokens: *const u32,
+    ) -> HRESULT;
 
     /// Apply changes from Edit and Continue.
-    pub unsafe fn ApplyChanges(&self, cbMetadata: u32, pbMetadata: *const u8, cbIL: u32, pbIL: *const u8) -> HRESULT;
+    pub unsafe fn ApplyChanges(
+        &self,
+        cbMetadata: u32,
+        pbMetadata: *const u8,
+        cbIL: u32,
+        pbIL: *const u8,
+    ) -> HRESULT;
 
     /// Set JIT compiler flags.
     pub unsafe fn SetJITCompilerFlags(&self, dwFlags: u32) -> HRESULT;
@@ -74,7 +100,11 @@ pub unsafe trait ICorDebugModule2: IUnknown {
     pub unsafe fn GetJITCompilerFlags(&self, pdwFlags: *mut u32) -> HRESULT;
 
     /// Resolve an assembly reference.
-    pub unsafe fn ResolveAssembly(&self, tkAssemblyRef: u32, ppAssembly: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn ResolveAssembly(
+        &self,
+        tkAssemblyRef: u32,
+        ppAssembly: *mut *mut IUnknown,
+    ) -> HRESULT;
 }
 
 /// ICorDebugModule3 - Module interface for WinMD.
@@ -143,7 +173,10 @@ pub unsafe trait ICorDebugFunction2: IUnknown {
 #[interface("09B70F28-E465-482D-99E0-81A165EB0532")]
 pub unsafe trait ICorDebugFunction3: IUnknown {
     /// Get the active ReJIT request IL code.
-    pub unsafe fn GetActiveReJitRequestILCode(&self, ppReJitedILCode: *mut *mut IUnknown) -> HRESULT;
+    pub unsafe fn GetActiveReJitRequestILCode(
+        &self,
+        ppReJitedILCode: *mut *mut IUnknown,
+    ) -> HRESULT;
 }
 
 /// ICorDebugFunction4 - Function interface for local variables.
@@ -152,4 +185,3 @@ pub unsafe trait ICorDebugFunction4: IUnknown {
     /// Create native breakpoint.
     pub unsafe fn CreateNativeBreakpoint(&self, ppBreakpoint: *mut *mut IUnknown) -> HRESULT;
 }
-
