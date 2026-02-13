@@ -1,15 +1,12 @@
-Add Additional Hosting interfaces for CLR control
+Add Fusion/Assembly binding interfaces (legacy .NET Framework)
 
-This adds hosting control interfaces:
-- ICLRControl, IHostControl - Host/CLR control exchange
-- ICLRGCManager, ICLRGCManager2 - GC configuration
-- ICLRPolicyManager - Runtime policy control
-- ICLRErrorReportingManager - Watson error reporting
-- ICLRHostProtectionManager - Code access security
-- ICLRDebugging - Debug process attachment
-- ICLRDebuggingLibraryProvider (1-3) - Debugging library provision
-- ICLRStrongName - Strong name key management and signing
-- ICLRTask, ICLRTask2 - CLR task representation
-- IHostTask - Host task implementation
-- ICLRTaskManager, IHostTaskManager - Task/thread management
-- CLR_DEBUGGING_VERSION, CLR_DEBUGGING_PROCESS_FLAGS structs/enums
+This adds the Global Assembly Cache (GAC) interfaces:
+- IAssemblyCache - Query, install, and uninstall assemblies from GAC
+- IAssemblyCacheItem - Assembly cache installation item
+- IAssemblyName - Assembly identity representation
+- IAssemblyEnum - Enumerate assemblies in the cache
+- IInstallReferenceItem, IInstallReferenceEnum - Install references
+- ASM_CACHE_FLAGS - Cache types (ZAP, GAC, DOWNLOAD, ROOT)
+- ASM_DISPLAY_FLAGS - Assembly display name formatting
+- ASM_NAME - Assembly name property enumeration
+- ASSEMBLY_INFO - Assembly information structure
