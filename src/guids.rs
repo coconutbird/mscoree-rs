@@ -39,5 +39,16 @@ pub const IID_ICorRuntimeHost: GUID = GUID::from_u128(0xcb2f6722_ab3a_11d2_9c40_
 /// IID for ICLRControl interface
 pub const IID_ICLRControl: GUID = GUID::from_u128(0x9065597e_d1a1_4fb2_b6ba_7e1fce230f61);
 
-/// IID for IHostControl interface  
+/// IID for IHostControl interface
 pub const IID_IHostControl: GUID = GUID::from_u128(0x02ca073c_7079_4860_880a_c2f7a449c991);
+
+// Debugging Interface IIDs
+
+/// IID for ICLRDataTarget interface
+pub const IID_ICLRDataTarget: GUID = GUID::from_u128(0x3e11ccee_d08b_43e5_af01_32717a64da03);
+
+/// IID for ICLRDataTarget2 interface
+pub const IID_ICLRDataTarget2: GUID = GUID::from_u128(0x6d05fae3_189c_4630_a6dc_1c251e1c01ab);
+
+/// IID for ICLRDataTarget3 interface
+pub const IID_ICLRDataTarget3: GUID = GUID::from_u128(0xa5664f95_0af4_4a1b_960e_2f3346b4214c);
